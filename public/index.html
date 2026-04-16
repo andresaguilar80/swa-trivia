@@ -322,11 +322,11 @@
         let timerInterval;
 
         // --- NEW AUDIO LOGIC FOR PUNCH-OUT ---
-        const bgMusic = new Audio('/8bit-loop.mp3');
+        const bgMusic = new Audio('/bg-music.mp3');
         bgMusic.loop = true;
         bgMusic.volume = 0.4; // Lower volume so it doesn't overpower
 
-        const epicEndingMusic = new Audio('/punch-out-ending.mp3');
+        const epicEndingMusic = new Audio('/victory-music.mp3');
         epicEndingMusic.volume = 0.9; // Loud and triumphant
 
         function joinGame() {
