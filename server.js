@@ -39,7 +39,7 @@ io.on('connection', (socket) => {
         } else {
             // End Game
             let sorted = Object.values(players).sort((a, b) => b.score - a.score);
-            io.emit('gameOver', sorted.slice(0, 3)); // Send top 3 podium
+            io.emit('gameOver', sorted.slice(0, 3)); 
         }
     });
 
@@ -48,17 +48,18 @@ io.on('connection', (socket) => {
         if(!player || player.hasAnswered || !isAcceptingAnswers) return;
         
         player.hasAnswered = true;
-        let timeTaken = (Date.now() - questionStartTime) / 1000; // in seconds
+        let timeTaken = (Date.now() - questionStartTime) / 1000; 
         
         if (ansIndex === questions[currentQuestion].ans) {
-            let points = 100; // Base score
+            let points = 100; 
             let bonus = 0;
             
             if (timeTaken < 1) {
                 bonus = 600;
             } else {
                 bonus = 600 - (Math.floor(timeTaken) * 20);
-                if (timeTaken >= 30) bonus = 20; 
+                // Adjusted cap to 20 seconds
+                if (timeTaken >= 20) bonus = 20; 
                 if (bonus < 20) bonus = 20;
             }
             player.score += (points + bonus);
@@ -69,7 +70,7 @@ io.on('connection', (socket) => {
         isAcceptingAnswers = false;
         currentQuestion++;
         let sorted = Object.values(players).sort((a, b) => b.score - a.score);
-        io.emit('leaderboard', sorted.slice(0, 10)); // Top 10
+        io.emit('leaderboard', sorted.slice(0, 10)); 
     });
 
     socket.on('disconnect', () => {
