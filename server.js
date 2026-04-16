@@ -29,10 +29,8 @@ const questions = [
 
 io.on('connection', (socket) => {
     
-    // Broadcast if host button should be hidden for new users
     socket.emit('hostStatus', !!hostSocketId);
 
-    // Validate Host Credential
     socket.on('claimHost', (adminName) => {
         if (adminName !== "andresaguilar80") {
             socket.emit('hostClaimed', { success: false, message: "INVALID CREDENTIALS." });
@@ -42,7 +40,7 @@ io.on('connection', (socket) => {
         if (!hostSocketId) {
             hostSocketId = socket.id;
             socket.emit('hostClaimed', { success: true, questions: questions });
-            io.emit('hostStatus', true); // Hide button for everyone else
+            io.emit('hostStatus', true); 
         } else {
             socket.emit('hostClaimed', { success: false, message: "Another user is already hosting this game!" });
         }
@@ -68,7 +66,14 @@ io.on('connection', (socket) => {
             questionStartTime = Date.now();
             for(let id in players) players[id].hasAnswered = false;
             
-            io.emit('newQuestion', { qIndex: currentQuestion, question: questions[currentQuestion] });
+            // Check if it's the last question for the bonus banner
+            let isLast = currentQuestion === (questions.length - 1);
+            
+            io.emit('newQuestion', { 
+                qIndex: currentQuestion, 
+                question: questions[currentQuestion],
+                isLast: isLast
+            });
             io.emit('updatePlayers', Object.values(players)); 
         } else {
             let sorted = Object.values(players).sort((a, b) => b.score - a.score);
@@ -93,7 +98,15 @@ io.on('connection', (socket) => {
                 if (timeTaken >= 20) bonus = 20; 
                 if (bonus < 20) bonus = 20;
             }
-            player.score += (points + bonus);
+            
+            let totalPointsEarned = points + bonus;
+            
+            // MULTIPLY BY 2 IF IT IS THE LAST QUESTION
+            if (currentQuestion === (questions.length - 1)) {
+                totalPointsEarned *= 2;
+            }
+            
+            player.score += totalPointsEarned;
         }
         
         io.emit('updatePlayers', Object.values(players));
@@ -102,9 +115,19 @@ io.on('connection', (socket) => {
     socket.on('endQuestion', () => {
         if (socket.id !== hostSocketId) return; 
         isAcceptingAnswers = false;
+        
+        // Grab the correct answer text before incrementing the index
+        let correctOptIndex = questions[currentQuestion].ans;
+        let correctText = questions[currentQuestion].options[correctOptIndex];
+        
         currentQuestion++;
         let sorted = Object.values(players).sort((a, b) => b.score - a.score);
-        io.emit('leaderboard', sorted.slice(0, 10)); 
+        
+        // Send both the leaderboard and the correct answer text
+        io.emit('leaderboard', { 
+            top10: sorted.slice(0, 10), 
+            correctAnswer: correctText 
+        }); 
     });
 
     socket.on('restartGame', () => {
@@ -125,7 +148,7 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         if (socket.id === hostSocketId) {
             hostSocketId = null; 
-            io.emit('hostStatus', false); // Show button again if host leaves
+            io.emit('hostStatus', false); 
         }
         delete players[socket.id];
         io.emit('updatePlayers', Object.values(players));
