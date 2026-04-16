@@ -138,9 +138,10 @@
         </div>
     </div>
 
-    <div id="leaderboard-screen" class="hidden animate-slide">
+	<div id="leaderboard-screen" class="hidden animate-slide">
         <h2 style="color: var(--swa-yellow);">Top 10 Leaderboard</h2>
         <ol id="leaderboard"></ol>
+        <h3 id="leaderboard-timer" style="color: white; margin-top: 20px; font-size: 24px;">Next question in: 20s</h3>
     </div>
 
     <div id="podium-screen" class="hidden animate-slide">
@@ -176,11 +177,13 @@
         });
 
         function startQuestion() {
-            // Change the button text after the game begins
+            // Hide the start button after clicking so the Host knows it is on autopilot
             const startBtn = document.getElementById('start-btn');
-            if (startBtn.innerText === "START GAME") {
-                startBtn.innerText = "START NEXT QUESTION";
-            }
+            if (startBtn) startBtn.classList.add('hidden'); 
+            
+            socket.emit('startQuestion');
+        }
+		// ... [keep the existing newQuestion, submitAnswer, and startTimer functions] ...
             
             socket.emit('startQuestion');
         } {
@@ -254,9 +257,29 @@
                 li.innerText = `${p.name} - ${p.score} pts`;
                 list.appendChild(li);
             });
+
+            // AUTOPILOT LOGIC: 20 Second Leaderboard Timer
+            let boardTimeLeft = 20;
+            const lbTimerEl = document.getElementById('leaderboard-timer');
+            lbTimerEl.innerText = `Next question in: ${boardTimeLeft}s`;
+            
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                boardTimeLeft--;
+                lbTimerEl.innerText = `Next question in: ${boardTimeLeft}s`;
+                
+                if (boardTimeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    // The Host automatically triggers the next question for everyone
+                    if (isHost) {
+                        startQuestion(); 
+                    }
+                }
+            }, 1000);
         });
 
         socket.on('gameOver', (podium) => {
+            clearInterval(timerInterval); // Stop any running timers
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('leaderboard-screen').classList.add('hidden');
             document.getElementById('host-screen').classList.add('hidden');
@@ -265,7 +288,7 @@
             list.innerHTML = '';
             podium.forEach((p, i) => {
                 let li = document.createElement('li');
-                li.innerText = `${p.name} - ${p.score} pts`;
+                li.innerText = `${i+1} Place: ${p.name} - ${p.score} pts`;
                 list.appendChild(li);
             });
         });
