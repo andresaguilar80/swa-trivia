@@ -115,7 +115,7 @@
             <i>Ready for takeoff? You can start the game at any time, even if not everyone has joined.</i>
         </p>
         <button id="start-btn" class="btn btn-c" onclick="startQuestion()" style="font-size: 22px; padding: 20px;">START GAME</button>
-        <div id="timer-host" class="hidden" style="margin-top:20px; font-size:24px;">Time left: <span id="time-left-host">30</span>s</div>
+        <div id="timer-host" class="hidden" style="margin-top:20px; font-size:24px;">Time left: <span id="time-left-host">20</span>s</div>
     </div>
 
     <div id="game-screen" class="hidden">
@@ -123,7 +123,7 @@
             <h2 id="question-text" style="margin:0;">Waiting for host...</h2>
         </div>
         
-        <div id="timer">30</div>
+        <div id="timer">20</div>
         
         <div id="options" class="hidden animate-fade">
             <button class="btn btn-a" onclick="submitAnswer(0)" id="opt0">A</button>
@@ -141,7 +141,7 @@
     <div id="leaderboard-screen" class="hidden animate-slide">
         <h2 style="color: var(--swa-yellow);">Top 10 Leaderboard</h2>
         <ol id="leaderboard"></ol>
-        <h3 id="leaderboard-timer" style="color: white; margin-top: 20px; font-size: 24px;">Next question in: 20s</h3>
+        <h3 id="leaderboard-timer" style="color: white; margin-top: 20px; font-size: 24px;">Next question in: 10s</h3>
     </div>
 
     <div id="podium-screen" class="hidden animate-slide">
@@ -211,7 +211,7 @@
         }
 
         function startTimer() {
-            let timeLeft = 30;
+            let timeLeft = 20;
             const timerEl = document.getElementById('timer');
             timerEl.classList.remove('timer-warning');
             
@@ -226,7 +226,7 @@
                 timeLeft--;
                 if(!isHost) {
                     timerEl.innerText = timeLeft;
-                    if(timeLeft <= 10) timerEl.classList.add('timer-warning'); 
+                    if(timeLeft <= 5) timerEl.classList.add('timer-warning'); 
                 }
                 if(isHost) document.getElementById('time-left-host').innerText = timeLeft;
                 
@@ -249,7 +249,7 @@
                 list.appendChild(li);
             });
 
-            let boardTimeLeft = 20;
+            let boardTimeLeft = 10;
             const lbTimerEl = document.getElementById('leaderboard-timer');
             lbTimerEl.innerText = `Next question in: ${boardTimeLeft}s`;
             
