@@ -2,31 +2,164 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SWA Trivia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SWA Retro Trivia</title>
     <style>
-        /* Paleta de Colores Southwest Airlines */
+        /* SWA Color Palette */
         :root {
-            --swa-blue: #111b4d;
-            --swa-red: #E8112d;
-            --swa-yellow: #F7D116;
-            --swa-light-blue: #304CB2;
-            --swa-silver: #A7A9AC;
+            --swa-blue: #111b4d; /* Heart Blue (Fuselage) */
+            --swa-red: #E8112d;  /* Warm Red (Tail Stripe) */
+            --swa-yellow: #F7D116; /* Sunrise Yellow (Tail Stripe) */
+            --swa-light-blue: #304CB2; /* Bold Blue */
+            --swa-silver: #A7A9AC; /* Silver (Wings) */
+            --retro-sky-top: #4d88ff;
+            --retro-sky-bot: #99c2ff;
+        }
+
+        /* --- LAYOUT RESET & ALIGNMENT --- */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Keep background contained */
+            font-family: 'Courier New', Courier, monospace; /* Retro feel font */
+            background-color: var(--swa-blue);
         }
 
         body { 
-            font-family: 'Arial', sans-serif; 
-            background-color: var(--swa-blue); 
+            display: flex;
+            justify-content: center; /* Horizontal centering */
+            align-items: center;    /* Vertical centering */
             color: white; 
             text-align: center; 
-            margin: 0; 
-            padding: 20px; 
-            overflow-x: hidden;
         }
 
-        h1 { color: var(--swa-yellow); text-transform: uppercase; letter-spacing: 2px; }
+        /* --- 8-BIT ANIMATED BACKGROUND --- */
+        .retro-background {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, var(--retro-sky-top), var(--retro-sky-bot) 70%, #d9d9d9 70%, #999999 71%, #333333 71%);
+            z-index: 0;
+            image-rendering: pixelated; /* Crucial for 8-bit look */
+        }
 
-        /* Animaciones */
+        /* Pixel Cloud Generator */
+        .cloud {
+            position: absolute;
+            background: white;
+            width: 20px; height: 20px;
+            /* Box-shadows create pixel shapes */
+            box-shadow: -20px 0 white, 20px 0 white, 0 -20px white, 0 20px white, 
+                        -40px 20px white, 40px 20px white, -20px 40px white, 20px 40px white;
+            opacity: 0.8;
+            animation: moveClouds linear infinite;
+        }
+        @keyframes moveClouds {
+            from { transform: translateX(110vw); }
+            to { transform: translateX(-50vw); }
+        }
+
+        /* Pixel Airport Terminal */
+        .terminal {
+            position: absolute;
+            bottom: 29%; left: 10%;
+            width: 100px; height: 60px;
+            background: #666;
+            box-shadow: 20px -20px #666, 40px -20px #666, 120px 0 #666, 140px 0 #666;
+        }
+        .terminal-window {
+            position: absolute; top: 10px; left: 10px; width: 10px; height: 10px; background: #ffff99;
+            box-shadow: 20px 0 #ffff99, 40px 0 #ffff99, 20px 20px #ffff99, 120px 0 #ffff99;
+        }
+
+        /* --- 8-BIT SWA PLANES (CSS ART) --- */
+        .plane {
+            position: absolute;
+            width: 80px; height: 20px;
+            z-index: 1;
+            /* Simple silhouette initially */
+        }
+        
+        /* Plane Body */
+        .plane::before {
+            content: ''; position: absolute; left: 0; top: 5px;
+            width: 60px; height: 10px; background: var(--swa-blue); /* Fuselage */
+            box-shadow: 5px -5px var(--swa-blue); /* Nose */
+        }
+        
+        /* Plane Tail & Wings (SWA Colors) */
+        .plane::after {
+            content: ''; position: absolute; right: 0; top: 0;
+            width: 15px; height: 20px;
+            /* Tail Stripes: Red, Yellow, Blue */
+            background: linear-gradient(to bottom, 
+                var(--swa-red) 33%, 
+                var(--swa-yellow) 33% 66%, 
+                var(--swa-blue) 66%);
+            box-shadow: -35px 15px var(--swa-silver), -50px 15px var(--swa-silver); /* Wings */
+        }
+
+        /* Animation: Takeoff */
+        .plane-takeoff {
+            bottom: 35%; left: -100px;
+            animation: planeTakeoff 25s linear infinite;
+        }
+        @keyframes planeTakeoff {
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+            5% { opacity: 1; }
+            30% { transform: translate(40vw, -10vh) rotate(-15deg); }
+            60% { transform: translate(80vw, -30vh) rotate(-20deg); }
+            95% { opacity: 1; }
+            100% { transform: translate(110vw, -45vh) rotate(-20deg); opacity: 0; }
+        }
+
+        /* Animation: Landing */
+        .plane-landing {
+            top: 10%; right: -100px;
+            animation: planeLanding 30s linear infinite;
+            animation-delay: 10s;
+        }
+        @keyframes planeLanding {
+            0% { transform: translate(0, 0) scaleX(-1) rotate(0deg); opacity: 0; }
+            5% { opacity: 1; }
+            40% { transform: translate(-40vw, 10vh) scaleX(-1) rotate(10deg); }
+            70% { transform: translate(-80vw, 30vh) scaleX(-1) rotate(5deg); }
+            95% { opacity: 1; }
+            100% { transform: translate(-110vw, 35vh) scaleX(-1) rotate(0deg); opacity: 0; }
+        }
+
+        /* --- GAME CONTENT CONTAINER --- */
+        #game-layout {
+            position: relative;
+            z-index: 10; /* Above background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%; height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #game-card {
+            /* Semi-transparent blur container */
+            background-color: rgba(17, 27, 77, 0.85); /* SWA Blue with alpha */
+            backdrop-filter: blur(5px);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 3px solid var(--swa-yellow);
+            max-width: 500px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        h1 { color: var(--swa-yellow); text-transform: uppercase; letter-spacing: 2px; margin-top: 0; }
+
+        /* General Animations */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); color: var(--swa-red); } 100% { transform: scale(1); } }
@@ -34,37 +167,38 @@
         .animate-fade { animation: fadeIn 0.8s ease-out forwards; }
         .animate-slide { animation: slideDown 0.6s ease-out forwards; }
 
-        /* Botones */
+        /* --- Buttons & Inputs --- */
         .btn { 
+            font-family: 'Courier New', Courier, monospace;
             padding: 15px 30px; 
             margin: 10px; 
             font-size: 18px; 
             cursor: pointer; 
-            border: none; 
-            border-radius: 8px; 
+            border: 4px solid white; /* Retro border */
+            border-radius: 0; /* Retro sharp corners */
             font-weight: bold; 
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            width: 90%;
+            transition: all 0.2s ease;
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
+            width: 100%;
             max-width: 400px;
+            box-sizing: border-box;
         }
-        .btn:hover { transform: scale(1.05); filter: brightness(1.1); }
-        .btn:active { transform: scale(0.95); }
+        .btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 rgba(0,0,0,0.5); filter: brightness(1.1); }
+        .btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 rgba(0,0,0,0.5); }
 
-        /* Colores de Respuestas */
-        .btn-a { background-color: var(--swa-light-blue); color: white; }
-        .btn-b { background-color: var(--swa-yellow); color: black; }
-        .btn-c { background-color: var(--swa-red); color: white; }
-        .btn-d { background-color: var(--swa-silver); color: black; }
+        .btn-a { background-color: var(--swa-light-blue); color: white; border-color: white; }
+        .btn-b { background-color: var(--swa-yellow); color: black; border-color: black; }
+        .btn-c { background-color: var(--swa-red); color: white; border-color: white; }
+        .btn-d { background-color: var(--swa-silver); color: black; border-color: black; }
 
         .hidden { display: none !important; }
 
-        /* Temporizador */
-        #timer { font-size: 50px; font-weight: bold; color: var(--swa-yellow); margin: 20px; transition: color 0.3s; }
+        /* Timer */
+        #timer { font-size: 60px; font-weight: bold; color: var(--swa-yellow); margin: 15px; transition: color 0.3s; text-shadow: 4px 4px 0 rgba(0,0,0,0.5); }
         .timer-warning { animation: pulse 1s infinite; color: var(--swa-red) !important; }
 
-        /* Cajas de Preguntas y Formularios */
-        input { padding: 15px; font-size: 18px; border-radius: 5px; border: 2px solid var(--swa-yellow); text-align: center; width: 80%; max-width: 300px; outline: none; }
+        /* Forms */
+        input { font-family: 'Courier New', Courier, monospace; padding: 15px; font-size: 18px; border-radius: 0; border: 4px solid var(--swa-yellow); background: rgba(0,0,0,0.3); color: white; text-align: center; width: 100%; max-width: 300px; outline: none; box-sizing: border-box;}
         input:focus { border-color: var(--swa-red); }
 
         #question-box {
@@ -72,83 +206,101 @@
             padding: 20px;
             border-radius: 12px;
             margin: 0 auto 20px auto;
-            max-width: 600px;
+            width: 100%;
             box-shadow: 0 5px 15px rgba(0,0,0,0.4);
             border: 3px solid white;
+            box-sizing: border-box;
         }
 
         /* Leaderboard */
         #leaderboard, #podium { 
-            font-size: 22px; 
+            font-size: 20px; 
             text-align: left; 
+            width: 100%;
             max-width: 400px; 
             margin: 0 auto; 
-            background: rgba(255, 255, 255, 0.1); 
-            padding: 20px 40px; 
-            border-radius: 10px; 
-            border-left: 5px solid var(--swa-yellow);
+            background: rgba(0, 0, 0, 0.4); 
+            padding: 20px 30px; 
+            border-radius: 8px; 
+            border: 2px solid var(--swa-silver);
+            box-sizing: border-box;
         }
-        #leaderboard li, #podium li { margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px; }
-        #podium li:nth-child(1) { font-size: 28px; color: var(--swa-yellow); font-weight: bold; } 
-        #podium li:nth-child(2) { font-size: 24px; color: var(--swa-silver); } 
-        #podium li:nth-child(3) { font-size: 22px; color: #cd7f32; } 
+        #leaderboard li, #podium li { margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px; list-style-position: inside; }
+        #podium li:nth-child(1) { font-size: 26px; color: var(--swa-yellow); font-weight: bold; } 
+        #podium li:nth-child(2) { font-size: 22px; color: var(--swa-silver); } 
+        #podium li:nth-child(3) { font-size: 20px; color: #cd7f32; } 
 
-        #host-screen { background: rgba(0,0,0,0.4); padding: 30px; border-radius: 15px; }
+        #host-screen { background: rgba(0,0,0,0.4); padding: 20px; border-radius: 10px; width: 100%; box-sizing: border-box;}
     </style>
 </head>
 <body>
 
-    <h1 class="animate-fade">Southwest Airlines Trivia</h1>
-    
-    <div id="login-screen" class="animate-fade">
-        <input type="text" id="username" placeholder="Enter your Name" maxlength="20">
-        <br><br>
-        <button class="btn btn-b" onclick="joinGame()">JOIN GAME</button>
-        <br><br><br>
-        <button class="btn" style="background: transparent; border: 1px solid white; color: white;" onclick="becomeHost()">I am the Host</button>
-    </div>
-
-    <div id="host-screen" class="hidden animate-fade">
-        <h2 style="color: var(--swa-yellow);">Host Dashboard</h2>
-        <h3 id="player-count">Players Connected: 0</h3>
-        <p style="color: var(--swa-silver); margin-bottom: 20px;">
-            <i>Ready for takeoff? You can start the game at any time, even if not everyone has joined.</i>
-        </p>
-        <button id="start-btn" class="btn btn-c" onclick="startQuestion()" style="font-size: 22px; padding: 20px;">START GAME</button>
-        <div id="timer-host" class="hidden" style="margin-top:20px; font-size:24px;">Time left: <span id="time-left-host">20</span>s</div>
-    </div>
-
-    <div id="game-screen" class="hidden">
-        <div id="question-box" class="animate-slide hidden">
-            <h2 id="question-text" style="margin:0;">Waiting for host...</h2>
-        </div>
+    <div class="retro-background">
+        <div class="cloud" style="top: 15%; animation-duration: 40s; animation-delay: -5s;"></div>
+        <div class="cloud" style="top: 25%; animation-duration: 35s; animation-delay: -15s; transform: scale(0.7);"></div>
+        <div class="cloud" style="top: 10%; animation-duration: 50s; animation-delay: -30s; transform: scale(1.2);"></div>
         
-        <div id="timer">20</div>
-        
-        <div id="options" class="hidden animate-fade">
-            <button class="btn btn-a" onclick="submitAnswer(0)" id="opt0">A</button>
-            <button class="btn btn-b" onclick="submitAnswer(1)" id="opt1">B</button><br>
-            <button class="btn btn-c" onclick="submitAnswer(2)" id="opt2">C</button>
-            <button class="btn btn-d" onclick="submitAnswer(3)" id="opt3">D</button>
-        </div>
-        
-        <div id="wait-msg" class="hidden animate-fade">
-            <h3 style="color: var(--swa-yellow);">✈️ Awesome!</h3>
-            <p>Answer submitted. Prepare for landing while others finish...</p>
-        </div>
+        <div class="plane plane-takeoff"></div>
+        <div class="plane plane-landing"></div>
+
+        <div class="terminal"><div class="terminal-window"></div></div>
     </div>
 
-    <div id="leaderboard-screen" class="hidden animate-slide">
-        <h2 style="color: var(--swa-yellow);">Top 10 Leaderboard</h2>
-        <ol id="leaderboard"></ol>
-        <h3 id="leaderboard-timer" style="color: white; margin-top: 20px; font-size: 24px;">Next question in: 10s</h3>
-    </div>
+    <div id="game-layout">
+        <div id="game-card">
+            <h1 class="animate-fade">SWA Retro Trivia</h1>
+            
+            <div id="login-screen" class="animate-fade" style="width: 100%;">
+                <input type="text" id="username" placeholder="Enter Name" maxlength="20">
+                <br><br>
+                <button class="btn btn-b" onclick="joinGame()">JOIN GAME</button>
+                <br><br><br>
+                <button class="btn" style="background: transparent; border: 2px solid white; color: white;" onclick="becomeHost()">I am the Host</button>
+            </div>
 
-    <div id="podium-screen" class="hidden animate-slide">
-        <h2 style="color: var(--swa-yellow); font-size: 35px;">🏆 FINAL PODIUM 🏆</h2>
-        <ol id="podium"></ol>
-        <br>
-        <button class="btn btn-a" onclick="location.reload()">Play Again</button>
+            <div id="host-screen" class="hidden animate-fade">
+                <h2 style="color: var(--swa-yellow);">Host Dashboard</h2>
+                <h3 id="player-count">Players Connected: 0</h3>
+                <p style="color: var(--swa-silver); margin-bottom: 20px; font-size: 14px;">
+                    <i>Ready? Click Start Game anytime.</i>
+                </p>
+                <button id="start-btn" class="btn btn-c" onclick="startQuestion()" style="font-size: 20px;">START GAME</button>
+                <div id="timer-host" class="hidden" style="margin-top:20px; font-size:22px;">Q Time: <span id="time-left-host">20</span>s</div>
+            </div>
+
+            <div id="game-screen" class="hidden" style="width: 100%;">
+                <div id="question-box" class="animate-slide hidden">
+                    <h2 id="question-text" style="margin:0; font-size: 20px;">Waiting...</h2>
+                </div>
+                
+                <div id="timer">20</div>
+                
+                <div id="options" class="hidden animate-fade" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                    <button class="btn btn-a" onclick="submitAnswer(0)" id="opt0">A</button>
+                    <button class="btn btn-b" onclick="submitAnswer(1)" id="opt1">B</button>
+                    <button class="btn btn-c" onclick="submitAnswer(2)" id="opt2">C</button>
+                    <button class="btn btn-d" onclick="submitAnswer(3)" id="opt3">D</button>
+                </div>
+                
+                <div id="wait-msg" class="hidden animate-fade">
+                    <h3 style="color: var(--swa-yellow);">✈️ Answered!</h3>
+                    <p style="font-size: 14px;">Prepare for landing while others finish...</p>
+                </div>
+            </div>
+
+            <div id="leaderboard-screen" class="hidden animate-slide" style="width: 100%;">
+                <h2 style="color: var(--swa-yellow); margin-bottom: 10px;">Top 10</h2>
+                <ol id="leaderboard"></ol>
+                <h3 id="leaderboard-timer" style="color: white; margin-top: 15px; font-size: 20px;">Next in: 10s</h3>
+            </div>
+
+            <div id="podium-screen" class="hidden animate-slide" style="width: 100%;">
+                <h2 style="color: var(--swa-yellow); font-size: 30px; margin-bottom: 10px;">🏆 FINAL 🏆</h2>
+                <ol id="podium"></ol>
+                <br>
+                <button class="btn btn-a" onclick="location.reload()" style="max-width: 200px;">Play Again</button>
+            </div>
+        </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
@@ -159,7 +311,7 @@
 
         function joinGame() {
             const name = document.getElementById('username').value.trim();
-            if(!name) return alert('Please enter your name to board!');
+            if(!name) return alert('Enter your name to board!');
             socket.emit('join', name);
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
@@ -251,12 +403,12 @@
 
             let boardTimeLeft = 10;
             const lbTimerEl = document.getElementById('leaderboard-timer');
-            lbTimerEl.innerText = `Next question in: ${boardTimeLeft}s`;
+            lbTimerEl.innerText = `Next in: ${boardTimeLeft}s`;
             
             clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 boardTimeLeft--;
-                lbTimerEl.innerText = `Next question in: ${boardTimeLeft}s`;
+                lbTimerEl.innerText = `Next in: ${boardTimeLeft}s`;
                 
                 if (boardTimeLeft <= 0) {
                     clearInterval(timerInterval);
