@@ -29,13 +29,21 @@ const questions = [
 
 io.on('connection', (socket) => {
     
-    socket.on('claimHost', () => {
+    socket.emit('hostStatus', !!hostSocketId);
+
+    // NEW: Security check for admin username
+    socket.on('claimHost', (adminName) => {
+        if (adminName !== "andresaguilar80") {
+            socket.emit('hostClaimed', { success: false, message: "Invalid admin credentials." });
+            return;
+        }
+
         if (!hostSocketId) {
             hostSocketId = socket.id;
-            // Send the questions directly to the Host dashboard
             socket.emit('hostClaimed', { success: true, questions: questions });
+            io.emit('hostStatus', true); 
         } else {
-            socket.emit('hostClaimed', { success: false });
+            socket.emit('hostClaimed', { success: false, message: "Another user is already hosting this game!" });
         }
     });
 
@@ -60,7 +68,7 @@ io.on('connection', (socket) => {
             for(let id in players) players[id].hasAnswered = false;
             
             io.emit('newQuestion', { qIndex: currentQuestion, question: questions[currentQuestion] });
-            io.emit('updatePlayers', Object.values(players)); // Reset answers on host dash
+            io.emit('updatePlayers', Object.values(players)); 
         } else {
             let sorted = Object.values(players).sort((a, b) => b.score - a.score);
             io.emit('gameOver', sorted.slice(0, 3)); 
@@ -87,7 +95,6 @@ io.on('connection', (socket) => {
             player.score += (points + bonus);
         }
         
-        // Update the host dashboard live every time someone answers
         io.emit('updatePlayers', Object.values(players));
     });
 
@@ -115,7 +122,10 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        if (socket.id === hostSocketId) hostSocketId = null; 
+        if (socket.id === hostSocketId) {
+            hostSocketId = null; 
+            io.emit('hostStatus', false); 
+        }
         delete players[socket.id];
         io.emit('updatePlayers', Object.values(players));
     });
