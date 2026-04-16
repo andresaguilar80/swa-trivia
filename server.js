@@ -13,6 +13,10 @@ let currentQuestion = 0;
 let isAcceptingAnswers = false;
 let questionStartTime = 0;
 
+// NEW: Security and Game Flow States
+let gameStarted = false;
+let hostSocketId = null;
+
 const questions = [
     { q: "When did Southwest Airlines commence its first flights?", options: ["1967", "1971", "1980", "1995"], ans: 1 },
     { q: "What is the stock ticker symbol for Southwest Airlines?", options: ["SWA", "LUV", "SWAIR", "FLY"], ans: 1 },
@@ -25,19 +29,39 @@ const questions = [
 ];
 
 io.on('connection', (socket) => {
+    
+    // 1. HOST LOCKING LOGIC
+    socket.on('claimHost', () => {
+        if (!hostSocketId) {
+            hostSocketId = socket.id; // Lock the host role to this user
+            socket.emit('hostClaimed', true);
+        } else {
+            socket.emit('hostClaimed', false); // Reject if a host already exists
+        }
+    });
+
+    // 2. JOIN LOCKING LOGIC
     socket.on('join', (name) => {
+        if (gameStarted) {
+            socket.emit('joinError', 'The flight has already departed! You cannot join a game in progress.');
+            return;
+        }
         players[socket.id] = { name: name, score: 0, hasAnswered: false };
         io.emit('updatePlayers', Object.values(players));
+        socket.emit('joinSuccess');
     });
 
     socket.on('startQuestion', () => {
+        if (socket.id !== hostSocketId) return; // Only the host can start questions
+        
+        gameStarted = true; // Lock the room
+        
         if(currentQuestion < questions.length) {
             isAcceptingAnswers = true;
             questionStartTime = Date.now();
             for(let id in players) players[id].hasAnswered = false;
             io.emit('newQuestion', { qIndex: currentQuestion, question: questions[currentQuestion] });
         } else {
-            // End Game
             let sorted = Object.values(players).sort((a, b) => b.score - a.score);
             io.emit('gameOver', sorted.slice(0, 3)); 
         }
@@ -53,12 +77,10 @@ io.on('connection', (socket) => {
         if (ansIndex === questions[currentQuestion].ans) {
             let points = 100; 
             let bonus = 0;
-            
             if (timeTaken < 1) {
                 bonus = 600;
             } else {
                 bonus = 600 - (Math.floor(timeTaken) * 20);
-                // Adjusted cap to 20 seconds
                 if (timeTaken >= 20) bonus = 20; 
                 if (bonus < 20) bonus = 20;
             }
@@ -67,13 +89,34 @@ io.on('connection', (socket) => {
     });
 
     socket.on('endQuestion', () => {
+        if (socket.id !== hostSocketId) return; // Only host can trigger
         isAcceptingAnswers = false;
         currentQuestion++;
         let sorted = Object.values(players).sort((a, b) => b.score - a.score);
         io.emit('leaderboard', sorted.slice(0, 10)); 
     });
 
+    // 3. RESTART GAME LOGIC
+    socket.on('restartGame', () => {
+        if (socket.id !== hostSocketId) return; // Only host can restart
+        
+        gameStarted = false; // Unlock the room
+        currentQuestion = 0;
+        
+        // Reset all player scores to 0, but keep them in the lobby
+        for(let id in players) {
+            players[id].score = 0;
+            players[id].hasAnswered = false;
+        }
+        
+        io.emit('gameReset'); // Tell all clients to return to lobby view
+        io.emit('updatePlayers', Object.values(players));
+    });
+
     socket.on('disconnect', () => {
+        if (socket.id === hostSocketId) {
+            hostSocketId = null; // Free up the host role if the host disconnects
+        }
         delete players[socket.id];
         io.emit('updatePlayers', Object.values(players));
     });
