@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SWA Retro Trivia</title>
     <style>
-        /* SWA Color Palette */
         :root {
             --swa-blue: #111b4d; 
             --swa-red: #E8112d;  
@@ -28,14 +27,15 @@
         .plane { position: absolute; width: 80px; height: 20px; z-index: 1; }
         .plane::before { content: ''; position: absolute; left: 0; top: 5px; width: 60px; height: 10px; background: var(--swa-blue); box-shadow: 5px -5px var(--swa-blue); }
         .plane::after { content: ''; position: absolute; right: 0; top: 0; width: 15px; height: 20px; background: linear-gradient(to bottom, var(--swa-red) 33%, var(--swa-yellow) 33% 66%, var(--swa-blue) 66%); box-shadow: -35px 15px var(--swa-silver), -50px 15px var(--swa-silver); }
-
         .plane-takeoff { bottom: 35%; left: -100px; animation: planeTakeoff 25s linear infinite; }
         @keyframes planeTakeoff { 0% { transform: translate(0, 0) rotate(0deg); opacity: 0; } 5% { opacity: 1; } 30% { transform: translate(40vw, -10vh) rotate(-15deg); } 60% { transform: translate(80vw, -30vh) rotate(-20deg); } 95% { opacity: 1; } 100% { transform: translate(110vw, -45vh) rotate(-20deg); opacity: 0; } }
         .plane-landing { top: 10%; right: -100px; animation: planeLanding 30s linear infinite; animation-delay: 10s; }
         @keyframes planeLanding { 0% { transform: translate(0, 0) scaleX(-1) rotate(0deg); opacity: 0; } 5% { opacity: 1; } 40% { transform: translate(-40vw, 10vh) scaleX(-1) rotate(10deg); } 70% { transform: translate(-80vw, 30vh) scaleX(-1) rotate(5deg); } 95% { opacity: 1; } 100% { transform: translate(-110vw, 35vh) scaleX(-1) rotate(0deg); opacity: 0; } }
 
         #game-layout { position: relative; z-index: 10; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; padding: 20px; box-sizing: border-box; }
-        #game-card { background-color: rgba(17, 27, 77, 0.85); backdrop-filter: blur(5px); padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 3px solid var(--swa-yellow); max-width: 500px; width: 100%; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
+        
+        /* The game card will dynamically expand for the Host */
+        #game-card { background-color: rgba(17, 27, 77, 0.85); backdrop-filter: blur(5px); padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 3px solid var(--swa-yellow); max-width: 500px; width: 100%; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; transition: max-width 0.5s ease; }
 
         h1 { color: var(--swa-yellow); text-transform: uppercase; letter-spacing: 2px; margin-top: 0; text-shadow: 2px 2px 0 #000; }
 
@@ -73,7 +73,14 @@
         #podium li:nth-child(2) { font-size: 24px; color: var(--swa-silver); text-align: center; border-bottom: none;} 
         #podium li:nth-child(3) { font-size: 20px; color: #cd7f32; text-align: center; border-bottom: none;} 
 
-        #host-screen { background: rgba(0,0,0,0.6); padding: 20px; border-radius: 0px; border: 4px solid white; width: 100%; box-sizing: border-box;}
+        /* --- NEW HOST DASHBOARD STYLES --- */
+        #host-screen { width: 100%; box-sizing: border-box; }
+        .host-header-controls { display: flex; justify-content: space-around; align-items: center; margin-bottom: 20px; flex-wrap: wrap;}
+        .host-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; text-align: left; }
+        .host-panel { background: rgba(0,0,0,0.6); border: 2px solid var(--swa-silver); padding: 15px; height: 350px; overflow-y: auto; font-size: 14px; text-shadow: 1px 1px 0 #000;}
+        .host-panel h3 { margin-top: 0; color: var(--swa-yellow); text-align: center; font-size: 18px; border-bottom: 2px solid var(--swa-silver); padding-bottom: 10px; }
+        .host-panel ul { list-style: none; padding: 0; margin: 0; }
+        .host-panel li { padding: 8px 0; border-bottom: 1px dashed rgba(255,255,255,0.2); }
     </style>
 </head>
 <body>
@@ -100,13 +107,29 @@
             </div>
 
             <div id="host-screen" class="hidden animate-fade">
-                <h2 style="color: var(--swa-yellow); text-shadow: 2px 2px 0 #000;">HOST DASHBOARD</h2>
-                <h3 id="player-count">PLAYERS: 0</h3>
-                <p style="color: var(--swa-silver); margin-bottom: 20px; font-size: 14px;">
-                    <i>READY? CLICK TO START.</i>
-                </p>
-                <button id="start-btn" class="btn btn-c" onclick="startQuestion()" style="font-size: 20px;">START GAME</button>
-                <div id="timer-host" class="hidden" style="margin-top:20px; font-size:22px;">Q TIME: <span id="time-left-host">20</span>s</div>
+                <div class="host-header-controls">
+                    <div>
+                        <h2 style="color: var(--swa-yellow); text-shadow: 2px 2px 0 #000; margin: 0;">COMMAND CENTER</h2>
+                        <h3 id="player-count" style="margin: 5px 0;">PLAYERS: 0</h3>
+                    </div>
+                    <button id="start-btn" class="btn btn-c" onclick="startQuestion()" style="max-width: 250px; margin: 0;">START GAME</button>
+                    <div id="timer-host" class="hidden" style="font-size:24px; color: var(--swa-yellow); font-weight: bold;">Q TIME: <span id="time-left-host">20</span>s</div>
+                </div>
+
+                <div class="host-grid">
+                    <div class="host-panel">
+                        <h3>🟢 LIVE USERS</h3>
+                        <ul id="host-user-list"></ul>
+                    </div>
+                    <div class="host-panel">
+                        <h3>🏆 LIVE RANKING</h3>
+                        <ul id="host-live-leaderboard"></ul>
+                    </div>
+                    <div class="host-panel">
+                        <h3>📋 QUESTIONS GUIDE</h3>
+                        <ul id="host-questions-list"></ul>
+                    </div>
+                </div>
             </div>
 
             <div id="game-screen" class="hidden" style="width: 100%;">
@@ -154,22 +177,32 @@
         const epicEndingMusic = new Audio('/punch-out-ending.mp3');
         epicEndingMusic.volume = 0.9; 
 
-        // --- HOST VALIDATION ---
         function becomeHost() {
             socket.emit('claimHost');
         }
 
-        socket.on('hostClaimed', (success) => {
-            if (success) {
+        socket.on('hostClaimed', (data) => {
+            if (data.success) {
                 isHost = true;
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('host-screen').classList.remove('hidden');
+                
+                // Expand the card to fit the 3-column dashboard
+                document.getElementById('game-card').style.maxWidth = '1000px'; 
+                
+                // Populate the Questions Guide
+                const qList = document.getElementById('host-questions-list');
+                qList.innerHTML = '';
+                data.questions.forEach((q, i) => {
+                    let li = document.createElement('li');
+                    li.innerHTML = `<strong style="color: white;">Q${i+1}:</strong> ${q.q}<br><i style="color:var(--swa-yellow)">Ans: ${q.options[q.ans]}</i>`;
+                    qList.appendChild(li);
+                });
             } else {
                 alert('ACCESS DENIED: Another user is already hosting this game!');
             }
         });
 
-        // --- PLAYER JOIN VALIDATION ---
         function joinGame() {
             const name = document.getElementById('username').value.trim();
             if(!name) return alert('ENTER YOUR NAME TO BOARD!');
@@ -188,11 +221,32 @@
         });
 
         socket.on('joinError', (errorMsg) => {
-            alert(errorMsg); // Blocks late joiners
+            alert(errorMsg); 
         });
 
         socket.on('updatePlayers', (players) => {
-            if(isHost) document.getElementById('player-count').innerText = `PLAYERS: ${players.length}`;
+            if(isHost) {
+                document.getElementById('player-count').innerText = `PLAYERS: ${players.length}`;
+                
+                // Update Live Users & Status
+                const userList = document.getElementById('host-user-list');
+                userList.innerHTML = '';
+                players.forEach(p => {
+                    let li = document.createElement('li');
+                    li.innerText = p.name + (p.hasAnswered ? " ✅" : " ⏳");
+                    userList.appendChild(li);
+                });
+
+                // Update Live Ranking
+                const sorted = [...players].sort((a,b) => b.score - a.score).slice(0, 10);
+                const liveRank = document.getElementById('host-live-leaderboard');
+                liveRank.innerHTML = '';
+                sorted.forEach((p, i) => {
+                    let li = document.createElement('li');
+                    li.innerText = `${i+1}. ${p.name} - ${p.score} PTS`;
+                    liveRank.appendChild(li);
+                });
+            }
         });
 
         function startQuestion() {
@@ -312,9 +366,10 @@
                 list.appendChild(li);
             });
 
-            // --- RESTART BUTTON LOGIC ---
             const restartContainer = document.getElementById('restart-container');
             if (isHost) {
+                // Ensure card stays wide for Host at the end to fit the button nicely
+                document.getElementById('game-card').style.maxWidth = '1000px';
                 restartContainer.innerHTML = '<button class="btn btn-c" onclick="restartGame()" style="max-width: 250px;">RESTART GAME</button>';
             } else {
                 restartContainer.innerHTML = '<p style="color: var(--swa-yellow); font-weight: bold;">WAITING FOR HOST TO RESTART...</p>';
@@ -325,7 +380,6 @@
             socket.emit('restartGame');
         }
 
-        // --- GLOBAL RESET LISTENER ---
         socket.on('gameReset', () => {
             epicEndingMusic.pause();
             epicEndingMusic.currentTime = 0;
