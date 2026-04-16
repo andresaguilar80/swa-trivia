@@ -89,9 +89,9 @@
             border-left: 5px solid var(--swa-yellow);
         }
         #leaderboard li, #podium li { margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px; }
-        #podium li:nth-child(1) { font-size: 28px; color: var(--swa-yellow); font-weight: bold; } /* 1er lugar */
-        #podium li:nth-child(2) { font-size: 24px; color: var(--swa-silver); } /* 2do lugar */
-        #podium li:nth-child(3) { font-size: 22px; color: #cd7f32; } /* 3er lugar */
+        #podium li:nth-child(1) { font-size: 28px; color: var(--swa-yellow); font-weight: bold; } 
+        #podium li:nth-child(2) { font-size: 24px; color: var(--swa-silver); } 
+        #podium li:nth-child(3) { font-size: 22px; color: #cd7f32; } 
 
         #host-screen { background: rgba(0,0,0,0.4); padding: 30px; border-radius: 15px; }
     </style>
@@ -108,7 +108,7 @@
         <button class="btn" style="background: transparent; border: 1px solid white; color: white;" onclick="becomeHost()">I am the Host</button>
     </div>
 
-<div id="host-screen" class="hidden animate-fade">
+    <div id="host-screen" class="hidden animate-fade">
         <h2 style="color: var(--swa-yellow);">Host Dashboard</h2>
         <h3 id="player-count">Players Connected: 0</h3>
         <p style="color: var(--swa-silver); margin-bottom: 20px;">
@@ -138,7 +138,7 @@
         </div>
     </div>
 
-	<div id="leaderboard-screen" class="hidden animate-slide">
+    <div id="leaderboard-screen" class="hidden animate-slide">
         <h2 style="color: var(--swa-yellow);">Top 10 Leaderboard</h2>
         <ol id="leaderboard"></ol>
         <h3 id="leaderboard-timer" style="color: white; margin-top: 20px; font-size: 24px;">Next question in: 20s</h3>
@@ -177,23 +177,14 @@
         });
 
         function startQuestion() {
-            // Hide the start button after clicking so the Host knows it is on autopilot
             const startBtn = document.getElementById('start-btn');
             if (startBtn) startBtn.classList.add('hidden'); 
-            
-            socket.emit('startQuestion');
-        }
-		// ... [keep the existing newQuestion, submitAnswer, and startTimer functions] ...
-            
-            socket.emit('startQuestion');
-        } {
             socket.emit('startQuestion');
         }
 
         socket.on('newQuestion', (data) => {
             document.getElementById('leaderboard-screen').classList.add('hidden');
             
-            // Re-trigger animations
             const qBox = document.getElementById('question-box');
             qBox.classList.remove('animate-slide');
             void qBox.offsetWidth; // trigger reflow
@@ -235,7 +226,7 @@
                 timeLeft--;
                 if(!isHost) {
                     timerEl.innerText = timeLeft;
-                    if(timeLeft <= 10) timerEl.classList.add('timer-warning'); // Empieza a latir
+                    if(timeLeft <= 10) timerEl.classList.add('timer-warning'); 
                 }
                 if(isHost) document.getElementById('time-left-host').innerText = timeLeft;
                 
@@ -258,7 +249,6 @@
                 list.appendChild(li);
             });
 
-            // AUTOPILOT LOGIC: 20 Second Leaderboard Timer
             let boardTimeLeft = 20;
             const lbTimerEl = document.getElementById('leaderboard-timer');
             lbTimerEl.innerText = `Next question in: ${boardTimeLeft}s`;
@@ -270,16 +260,13 @@
                 
                 if (boardTimeLeft <= 0) {
                     clearInterval(timerInterval);
-                    // The Host automatically triggers the next question for everyone
-                    if (isHost) {
-                        startQuestion(); 
-                    }
+                    if (isHost) startQuestion(); 
                 }
             }, 1000);
         });
 
         socket.on('gameOver', (podium) => {
-            clearInterval(timerInterval); // Stop any running timers
+            clearInterval(timerInterval); 
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('leaderboard-screen').classList.add('hidden');
             document.getElementById('host-screen').classList.add('hidden');
