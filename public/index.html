@@ -33,7 +33,7 @@
         @keyframes planeLanding { 0% { transform: translate(0, 0) scaleX(-1) rotate(0deg); opacity: 0; } 5% { opacity: 1; } 40% { transform: translate(-40vw, 10vh) scaleX(-1) rotate(10deg); } 70% { transform: translate(-80vw, 30vh) scaleX(-1) rotate(5deg); } 95% { opacity: 1; } 100% { transform: translate(-110vw, 35vh) scaleX(-1) rotate(0deg); opacity: 0; } }
 
         /* Contenedor principal con scroll en caso de que sea celular */
-        #game-layout { position: relative; z-index: 10; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; padding: 20px; box-sizing: border-box; overflow-y: auto; }
+        #game-layout { position: relative; z-index: 10; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; padding: 20px; box-sizing: border-box; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         
         #game-card { background-color: rgba(17, 27, 77, 0.85); backdrop-filter: blur(5px); padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 3px solid var(--swa-yellow); max-width: 500px; width: 100%; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; transition: max-width 0.5s ease; margin: auto; }
 
@@ -73,30 +73,46 @@
         #podium li:nth-child(2) { font-size: 24px; color: var(--swa-silver); text-align: center; border-bottom: none;} 
         #podium li:nth-child(3) { font-size: 20px; color: #cd7f32; text-align: center; border-bottom: none;} 
 
-        /* --- HOST DASHBOARD STYLES --- */
+        /* --- HOST DASHBOARD STYLES CON SCROLL ACTIVO --- */
         #host-screen { width: 100%; box-sizing: border-box; }
         .host-header-controls { display: flex; justify-content: space-around; align-items: center; margin-bottom: 20px; flex-wrap: wrap;}
         .host-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; text-align: left; }
-        .host-panel { background: rgba(0,0,0,0.6); border: 2px solid var(--swa-silver); padding: 15px; height: 350px; overflow-y: auto; font-size: 14px; text-shadow: 1px 1px 0 #000;}
+        
+        .host-panel { 
+            background: rgba(0,0,0,0.6); 
+            border: 2px solid var(--swa-silver); 
+            padding: 15px; 
+            height: 350px; 
+            overflow-y: auto; /* Activa el desplazamiento */
+            -webkit-overflow-scrolling: touch; /* Suavidad táctil obligatoria en móviles */
+            overscroll-behavior: contain; /* Evita que la página del fondo se mueva al hacer scroll aquí */
+            font-size: 14px; 
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        /* --- BARRAS DE DESPLAZAMIENTO PERSONALIZADAS PARA EL PANEL (Chrome/Safari/Edge) --- */
+        .host-panel::-webkit-scrollbar, #game-layout::-webkit-scrollbar { width: 10px; }
+        .host-panel::-webkit-scrollbar-track, #game-layout::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); border-radius: 5px; }
+        .host-panel::-webkit-scrollbar-thumb, #game-layout::-webkit-scrollbar-thumb { background: var(--swa-yellow); border-radius: 5px; border: 1px solid var(--swa-blue); }
+        .host-panel::-webkit-scrollbar-thumb:hover, #game-layout::-webkit-scrollbar-thumb:hover { background: var(--swa-red); }
+
         .host-panel h3 { margin-top: 0; color: var(--swa-yellow); text-align: center; font-size: 18px; border-bottom: 2px solid var(--swa-silver); padding-bottom: 10px; }
         .host-panel ul { list-style: none; padding: 0; margin: 0; }
         .host-panel li { padding: 8px 0; border-bottom: 1px dashed rgba(255,255,255,0.2); }
 
         /* --- CSS RESPONSIVO PARA CELULARES --- */
         @media (max-width: 768px) {
-            #game-layout { padding: 10px; align-items: flex-start; } /* Permite scroll natural en celular */
-            #game-card { padding: 15px; border-width: 2px; margin-top: 20px; }
+            #game-layout { padding: 10px; align-items: flex-start; } 
+            #game-card { padding: 15px; border-width: 2px; margin-top: 20px; margin-bottom: 40px; } /* Espacio inferior para scroll */
             h1 { font-size: 22px; }
             .btn { font-size: 16px; padding: 12px 20px; }
             #timer { font-size: 45px; }
             
-            /* Ajustes del Host Dashboard para celular */
             .host-header-controls { flex-direction: column; gap: 15px; text-align: center; }
             #start-btn { width: 100%; max-width: 100%; }
-            .host-grid { grid-template-columns: 1fr; /* Apila las 3 columnas en 1 sola */ }
-            .host-panel { height: 250px; /* Reduce un poco la altura en celular para que quepa mejor */ }
+            .host-grid { grid-template-columns: 1fr; }
+            .host-panel { height: 280px; } 
             
-            /* Ajustes de podio para celular */
             #podium li:nth-child(1) { font-size: 45px; }
         }
     </style>
