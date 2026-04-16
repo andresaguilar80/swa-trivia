@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SWA Retro Trivia: Airport Hub</title>
+    <title>SWA PI 2026.3 PI Trivia</title>
     <style>
         :root {
             --swa-blue: #111b4d; 
@@ -21,16 +21,19 @@
         body { display: flex; justify-content: center; align-items: center; color: white; text-align: center; }
 
         #game-layout { position: relative; z-index: 10; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; padding: 20px; box-sizing: border-box; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-        #game-card { background-color: rgba(17, 27, 77, 0.85); backdrop-filter: blur(5px); padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 3px solid var(--swa-yellow); max-width: 500px; width: 100%; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; transition: max-width 0.5s ease; margin: auto; }
+        
+        /* Game Card - Transition added for transparent effect at the end */
+        #game-card { background-color: rgba(17, 27, 77, 0.85); backdrop-filter: blur(5px); padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 3px solid var(--swa-yellow); max-width: 500px; width: 100%; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; transition: all 0.5s ease; margin: auto; }
+        
+        /* Utility class to strip the box at the end of the game */
+        .transparent-card { background: transparent !important; border: none !important; box-shadow: none !important; backdrop-filter: none !important; }
 
-        h1 { color: var(--swa-yellow); text-transform: uppercase; letter-spacing: 2px; margin-top: 0; text-shadow: 2px 2px 0 #000; }
+        h1 { color: var(--swa-yellow); text-transform: uppercase; letter-spacing: 2px; margin-top: 0; text-shadow: 2px 2px 0 #000; font-size: 28px; }
         
         .btn { font-family: 'Courier New', Courier, monospace; padding: 15px 30px; margin: 10px; font-size: 18px; cursor: pointer; border: 4px solid white; border-radius: 50px; font-weight: bold; transition: all 0.2s ease; box-shadow: 4px 4px 0 rgba(0,0,0,0.5); width: 100%; max-width: 400px; box-sizing: border-box; text-transform: uppercase; }
         .btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 rgba(0,0,0,0.5); filter: brightness(1.1); }
         .btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 rgba(0,0,0,0.5); }
-        
         .btn-option { border-radius: 10px !important; }
-
         .btn-a { background-color: var(--swa-light-blue); color: white; border-color: white; }
         .btn-b { background-color: var(--swa-yellow); color: black; border-color: black; }
         .btn-c { background-color: var(--swa-red); color: white; border-color: white; }
@@ -46,12 +49,22 @@
         #question-box { background-color: var(--swa-red); padding: 20px; border-radius: 10px; margin: 0 auto 20px auto; width: 100%; box-shadow: 6px 6px 0 rgba(0,0,0,0.6); border: 4px solid white; box-sizing: border-box; }
         #question-text { text-shadow: 2px 2px 0 #000; }
 
-        #leaderboard, #podium { font-size: 20px; text-align: left; width: 100%; max-width: 400px; margin: 0 auto; background: rgba(0, 0, 0, 0.6); padding: 20px 30px; border-radius: 20px; border: 4px solid var(--swa-silver); box-sizing: border-box; list-style: none; padding-left: 20px; text-shadow: 2px 2px 0 #000; }
-        #leaderboard li, #podium li { margin-bottom: 15px; border-bottom: 2px dashed rgba(255,255,255,0.3); padding-bottom: 5px; list-style-position: inside; text-transform: uppercase;}
+        #leaderboard { font-size: 20px; text-align: left; width: 100%; max-width: 400px; margin: 0 auto; background: rgba(0, 0, 0, 0.6); padding: 20px 30px; border-radius: 20px; border: 4px solid var(--swa-silver); box-sizing: border-box; list-style: none; padding-left: 20px; text-shadow: 2px 2px 0 #000; }
+        #leaderboard li { margin-bottom: 15px; border-bottom: 2px dashed rgba(255,255,255,0.3); padding-bottom: 5px; list-style-position: inside; text-transform: uppercase;}
         
-        #podium li:nth-child(1) { font-size: 65px; color: var(--swa-yellow); font-weight: bold; text-transform: uppercase; text-shadow: 4px 4px 0 #000; line-height: 1.1; margin-bottom: 30px; text-align: center; border-bottom: none; animation: championFlash 1s infinite; } 
-        #podium li:nth-child(2) { font-size: 24px; color: var(--swa-silver); text-align: center; border-bottom: none;} 
-        #podium li:nth-child(3) { font-size: 20px; color: #cd7f32; text-align: center; border-bottom: none;} 
+        /* PRE-GAME LOBBY NAMES CLOUD */
+        .lobby-names-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 20px; max-height: 250px; overflow-y: auto; padding: 10px;}
+        .lobby-name { text-transform: uppercase; animation: fadeIn 0.5s ease-in; text-shadow: 2px 2px 0px #000; }
+
+        /* PODIUM 3D STYLES */
+        .podium-container { display: flex; justify-content: center; align-items: flex-end; gap: 5px; margin-top: 20px; height: 220px; width: 100%; max-width: 500px;}
+        .podium-place { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; width: 30%; text-shadow: 2px 2px 0 #000; }
+        .podium-bar { width: 100%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 28px; color: black; border-radius: 10px 10px 0 0; box-shadow: inset 0 10px 0 rgba(255,255,255,0.3), 4px 0 0 rgba(0,0,0,0.5); text-shadow: none;}
+        .podium-1 { height: 160px; background: var(--swa-yellow); }
+        .podium-2 { height: 110px; background: var(--swa-silver); }
+        .podium-3 { height: 70px; background: #cd7f32; }
+        .podium-name { margin-bottom: 5px; font-weight: bold; text-align: center; word-wrap: break-word; width: 100%; line-height: 1; }
+        .podium-score { margin-bottom: 5px; font-size: 14px; color: #fff; }
 
         /* BACKGROUND */
         .retro-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, var(--retro-sky-top), var(--retro-sky-mid) 40%, var(--retro-sky-bot) 70%, #d9d9d9 70%, #999999 71%, var(--ground-gray) 71%); z-index: 0; image-rendering: pixelated; }
@@ -109,9 +122,8 @@
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); color: var(--swa-red); } 100% { transform: scale(1); } }
         @keyframes championFlash { 0% { color: var(--swa-yellow); text-shadow: 4px 4px 0 #000; } 50% { color: white; text-shadow: 0 0 20px var(--swa-yellow), 4px 4px 0 #000; transform: scale(1.05); } 100% { color: var(--swa-yellow); text-shadow: 4px 4px 0 #000; } }
 
-        /* 8-BIT FIREWORKS (Increased) */
+        /* 8-BIT FIREWORKS */
         .firework { position: absolute; width: 6px; height: 6px; border-radius: 50%; animation: explode 1.5s infinite ease-out; z-index: 5; opacity: 0; }
-        /* Define positions and delays for 6 fireworks */
         .fw-1 { top: 15%; left: 20%; animation-delay: 0s; }
         .fw-2 { top: 25%; left: 40%; animation-delay: 0.3s; }
         .fw-3 { top: 10%; left: 60%; animation-delay: 0.6s; }
@@ -203,7 +215,7 @@
 
     <div id="game-layout">
         <div id="game-card">
-            <h1 class="animate-fade">SWA Retro Trivia</h1>
+            <h1 class="animate-fade">SWA PI 2026.3 PI Trivia</h1>
             
             <div id="login-screen" class="animate-fade" style="width: 100%;">
                 
@@ -250,10 +262,16 @@
             </div>
 
             <div id="game-screen" class="hidden" style="width: 100%;">
+                
+                <div id="bonus-banner" class="hidden" style="color: var(--swa-yellow); font-size: 26px; font-weight: bold; animation: championFlash 1s infinite; margin-bottom: 15px;">BONUS - DOUBLE POINTS!</div>
+
                 <div id="question-box" class="animate-slide hidden">
                     <h2 id="question-text" style="margin:0; font-size: 20px;">WAITING FOR HOST TO START...</h2>
                 </div>
-                <div id="timer">20</div>
+                
+                <div id="lobby-names-container" class="lobby-names-container"></div>
+
+                <div id="timer" class="hidden">20</div>
                 <div id="options" class="hidden animate-fade" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
                     <button class="btn btn-option btn-a" onclick="submitAnswer(0)" id="opt0">A</button>
                     <button class="btn btn-option btn-b" onclick="submitAnswer(1)" id="opt1">B</button>
@@ -267,14 +285,18 @@
             </div>
 
             <div id="leaderboard-screen" class="hidden animate-slide" style="width: 100%;">
+                <h3 id="last-correct-answer" style="color: #66ff66; text-shadow: 2px 2px 0 #000; margin-top: 0; font-size: 22px;"></h3>
+                
                 <h2 style="color: var(--swa-yellow); margin-bottom: 10px; text-shadow: 2px 2px 0 #000;">TOP 10</h2>
                 <ol id="leaderboard"></ol>
                 <h3 id="leaderboard-timer" style="color: white; margin-top: 15px; font-size: 20px; text-shadow: 2px 2px 0 #000;">NEXT IN: 10s</h3>
             </div>
 
             <div id="podium-screen" class="hidden animate-slide" style="width: 100%;">
-                <h2 style="color: var(--swa-yellow); font-size: 26px; margin-bottom: 20px; text-shadow: 3px 3px 0 #000;">🛫 You graduated as a PI Pilot - Congratulations 🛫</h2>
-                <ol id="podium"></ol>
+                <h2 style="color: var(--swa-yellow); font-size: 28px; margin-bottom: 10px; text-shadow: 3px 3px 0 #000;">You graduated as a PI Pilot<br>Congratulations</h2>
+                
+                <div class="podium-container" id="podium-bars"></div>
+                
                 <br>
                 <div id="restart-container"></div>
             </div>
@@ -286,6 +308,7 @@
         const socket = io();
         let isHost = false;
         let timerInterval;
+        let gameStartedClient = false; // Tracks phase for lobby names
 
         const bgMusic = new Audio('/8bit-loop.mp3');
         bgMusic.loop = true;
@@ -293,6 +316,9 @@
 
         const epicEndingMusic = new Audio('/punch-out-ending.mp3');
         epicEndingMusic.volume = 0.9; 
+
+        // Random fonts for lobby
+        const nameFonts = ['Courier New', 'Arial', 'Impact', 'Comic Sans MS', 'Verdana', 'Georgia', 'Trebuchet MS', 'Lucida Console'];
 
         function generateStars() {
             const container = document.getElementById('stars-container');
@@ -307,7 +333,6 @@
         }
         generateStars();
 
-        // Hide host button dynamically
         socket.on('hostStatus', (isClaimed) => {
             const hostBtn = document.getElementById('btn-show-host');
             if (hostBtn) {
@@ -319,7 +344,6 @@
             }
         });
 
-        // HOST LOGIN FLOW
         function showHostLogin() {
             document.getElementById('player-login-section').classList.add('hidden');
             document.getElementById('host-login-section').classList.remove('hidden');
@@ -357,7 +381,6 @@
             }
         });
 
-        // PLAYER FLOW
         function joinGame() {
             const name = document.getElementById('username').value.trim();
             if(!name) return alert('ENTER YOUR PILOT NAME TO BOARD!');
@@ -394,6 +417,21 @@
                     li.innerText = `${i+1}. ${p.name} - ${p.score} PTS`;
                     liveRank.appendChild(li);
                 });
+            } else if (!gameStartedClient) {
+                // Populate pre-game lobby cloud for players
+                const lobbyContainer = document.getElementById('lobby-names-container');
+                if (lobbyContainer) {
+                    lobbyContainer.innerHTML = '';
+                    players.forEach(p => {
+                        let span = document.createElement('span');
+                        span.className = 'lobby-name';
+                        span.innerText = p.name;
+                        span.style.fontFamily = nameFonts[Math.floor(Math.random() * nameFonts.length)];
+                        span.style.fontSize = Math.floor(Math.random() * 14 + 14) + 'px'; // 14 to 28px
+                        span.style.color = Math.random() > 0.5 ? 'var(--swa-yellow)' : 'white';
+                        lobbyContainer.appendChild(span);
+                    });
+                }
             }
         });
 
@@ -408,28 +446,41 @@
             }
         }
 
-        // Host manual skip
         function jumpToNext() {
             if (isHost) {
-                clearInterval(timerInterval); // Stop leaderboard 10s wait
+                clearInterval(timerInterval); 
                 startQuestion();
             }
         }
 
         socket.on('newQuestion', (data) => {
+            gameStartedClient = true;
             document.getElementById('leaderboard-screen').classList.add('hidden');
+            document.getElementById('lobby-names-container').innerHTML = ''; // Clear lobby cloud
+            
             const qBox = document.getElementById('question-box');
             qBox.classList.remove('animate-slide');
             void qBox.offsetWidth; 
             qBox.classList.add('animate-slide');
+            
             if(!isHost) {
                 document.getElementById('game-screen').classList.remove('hidden');
                 document.getElementById('question-box').classList.remove('hidden');
+                
+                // Show bonus banner if it is the last question
+                const bonusBanner = document.getElementById('bonus-banner');
+                if (data.isLast) {
+                    bonusBanner.classList.remove('hidden');
+                } else {
+                    bonusBanner.classList.add('hidden');
+                }
+
                 document.getElementById('question-text').innerText = data.question.q;
                 document.getElementById('opt0').innerText = `A) ${data.question.options[0]}`;
                 document.getElementById('opt1').innerText = `B) ${data.question.options[1]}`;
                 document.getElementById('opt2').innerText = `C) ${data.question.options[2]}`;
                 document.getElementById('opt3').innerText = `D) ${data.question.options[3]}`;
+                document.getElementById('timer').classList.remove('hidden');
                 document.getElementById('options').classList.remove('hidden');
                 document.getElementById('wait-msg').classList.add('hidden');
             }
@@ -467,18 +518,21 @@
             }, 1000);
         }
 
-        socket.on('leaderboard', (top10) => {
+        socket.on('leaderboard', (data) => {
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('leaderboard-screen').classList.remove('hidden');
+            
+            // SHOW CORRECT ANSWER
+            document.getElementById('last-correct-answer').innerText = "✔️ Correct: " + data.correctAnswer;
+
             const list = document.getElementById('leaderboard');
             list.innerHTML = '';
-            top10.forEach((p, index) => {
+            data.top10.forEach((p, index) => {
                 let li = document.createElement('li');
                 li.innerText = `${index + 1}. ${p.name} - ${p.score} PTS`;
                 list.appendChild(li);
             });
             
-            // Show Jump Button for Host
             if(isHost) {
                 document.getElementById('jump-btn').classList.remove('hidden');
             }
@@ -503,35 +557,61 @@
             document.getElementById('leaderboard-screen').classList.add('hidden');
             document.getElementById('host-screen').classList.add('hidden');
             
+            // STRIP THE BOX FOR THE FINALE
+            document.getElementById('game-card').classList.add('transparent-card');
+            
             if(isHost) document.getElementById('jump-btn').classList.add('hidden');
-            
             document.getElementById('podium-screen').classList.remove('hidden');
-            
-            // TRIGGER FIREWORKS!
             document.getElementById('fireworks-container').classList.remove('hidden');
 
-            const list = document.getElementById('podium');
-            list.innerHTML = '';
+            // RENDER 3D VISUAL PODIUM
+            const podiumBars = document.getElementById('podium-bars');
+            podiumBars.innerHTML = '';
+            
+            // Visual order: 2nd Place (Left), 1st Place (Center), 3rd Place (Right)
+            const visualOrder = [1, 0, 2]; 
+            
+            visualOrder.forEach(idx => {
+                let p = podium[idx];
+                if (p) {
+                    let placeDiv = document.createElement('div');
+                    placeDiv.className = 'podium-place';
+                    
+                    let nameDiv = document.createElement('div');
+                    nameDiv.className = 'podium-name';
+                    nameDiv.style.fontSize = idx === 0 ? '26px' : '18px';
+                    nameDiv.style.color = idx === 0 ? 'var(--swa-yellow)' : 'white';
+                    if (idx === 0) nameDiv.style.animation = 'championFlash 1s infinite';
+                    
+                    // Added planes instead of cups
+                    let emoji = idx === 0 ? '✈️' : '🛫';
+                    nameDiv.innerText = `${emoji}\n${p.name}`;
+
+                    let scoreDiv = document.createElement('div');
+                    scoreDiv.className = 'podium-score';
+                    scoreDiv.innerText = p.score + ' PTS';
+
+                    let barDiv = document.createElement('div');
+                    barDiv.className = `podium-bar podium-${idx + 1}`;
+                    barDiv.innerText = idx === 0 ? '1ST' : (idx === 1 ? '2ND' : '3RD');
+
+                    placeDiv.appendChild(nameDiv);
+                    placeDiv.appendChild(scoreDiv);
+                    placeDiv.appendChild(barDiv);
+                    podiumBars.appendChild(placeDiv);
+                }
+            });
+
             bgMusic.pause();
             bgMusic.currentTime = 0;
             epicEndingMusic.play().catch(err => console.log("Audio blocked"));
             
-            podium.forEach((p, i) => {
-                let li = document.createElement('li');
-                if (i === 0) {
-                    // UPDATED: Used plane emoji instead of medal
-                    li.innerText = `🛫 \n ${p.name} \n ${p.score} PTS`;
-                } else {
-                    li.innerText = `${i+1} PLACE: ${p.name} - ${p.score} PTS`;
-                }
-                list.appendChild(li);
-            });
             const restartContainer = document.getElementById('restart-container');
             if (isHost) {
-                document.getElementById('game-card').style.maxWidth = '1000px';
+                // Remove transparent card class if restarting
                 restartContainer.innerHTML = '<button class="btn btn-c" onclick="restartGame()" style="max-width: 250px;">RESTART GAME</button>';
             } else {
-                restartContainer.innerHTML = '<p style="color: var(--swa-yellow); font-weight: bold;">WAITING FOR HOST TO RESTART...</p>';
+                restartContainer.innerHTML = '<p style="color: var(--swa-yellow); font-weight: bold; text-shadow: 2px 2px 0 #000;">WAITING FOR HOST TO RESTART...</p>';
             }
         });
 
@@ -540,12 +620,15 @@
         }
 
         socket.on('gameReset', () => {
+            gameStartedClient = false;
             epicEndingMusic.pause();
             epicEndingMusic.currentTime = 0;
             clearInterval(timerInterval);
             
+            document.getElementById('game-card').classList.remove('transparent-card');
             document.getElementById('podium-screen').classList.add('hidden');
-            document.getElementById('fireworks-container').classList.add('hidden'); // Hide fireworks
+            document.getElementById('fireworks-container').classList.add('hidden'); 
+            document.getElementById('bonus-banner').classList.add('hidden');
             
             if (isHost) {
                 document.getElementById('host-screen').classList.remove('hidden');
@@ -555,7 +638,7 @@
                 document.getElementById('question-text').innerText = "WAITING FOR HOST TO START...";
                 document.getElementById('options').classList.add('hidden');
                 document.getElementById('wait-msg').classList.add('hidden');
-                document.getElementById('timer').innerText = "20";
+                document.getElementById('timer').classList.add('hidden');
                 bgMusic.play().catch(e => console.log("Audio blocked"));
             }
         });
