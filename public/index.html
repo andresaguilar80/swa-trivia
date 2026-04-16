@@ -25,12 +25,10 @@
 
         h1 { color: var(--swa-yellow); text-transform: uppercase; letter-spacing: 2px; margin-top: 0; text-shadow: 2px 2px 0 #000; }
         
-        /* Curved main buttons */
         .btn { font-family: 'Courier New', Courier, monospace; padding: 15px 30px; margin: 10px; font-size: 18px; cursor: pointer; border: 4px solid white; border-radius: 50px; font-weight: bold; transition: all 0.2s ease; box-shadow: 4px 4px 0 rgba(0,0,0,0.5); width: 100%; max-width: 400px; box-sizing: border-box; text-transform: uppercase; }
         .btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 rgba(0,0,0,0.5); filter: brightness(1.1); }
         .btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 rgba(0,0,0,0.5); }
         
-        /* Boxy answer buttons */
         .btn-option { border-radius: 10px !important; }
 
         .btn-a { background-color: var(--swa-light-blue); color: white; border-color: white; }
@@ -75,7 +73,6 @@
         @keyframes blinkUfo { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         @keyframes ufoZip { 0% { transform: translateX(0) translateY(0); } 10% { transform: translateX(20vw) translateY(-5vh); } 20% { transform: translateX(50vw) translateY(5vh); } 30% { transform: translateX(120vw) translateY(0); } 100% { transform: translateX(120vw); } }
 
-        /* PLANES */
         .plane { position: absolute; z-index: 1; image-rendering: pixelated;}
         .plane::before { content: ''; position: absolute; background: var(--swa-blue); } 
         .plane::after { content: ''; position: absolute; } 
@@ -112,11 +109,16 @@
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); color: var(--swa-red); } 100% { transform: scale(1); } }
         @keyframes championFlash { 0% { color: var(--swa-yellow); text-shadow: 4px 4px 0 #000; } 50% { color: white; text-shadow: 0 0 20px var(--swa-yellow), 4px 4px 0 #000; transform: scale(1.05); } 100% { color: var(--swa-yellow); text-shadow: 4px 4px 0 #000; } }
 
-        /* 8-BIT FIREWORKS */
+        /* 8-BIT FIREWORKS (Increased) */
         .firework { position: absolute; width: 6px; height: 6px; border-radius: 50%; animation: explode 1.5s infinite ease-out; z-index: 5; opacity: 0; }
-        .fw-1 { top: 20%; left: 30%; animation-delay: 0s; }
-        .fw-2 { top: 30%; left: 70%; animation-delay: 0.5s; }
-        .fw-3 { top: 15%; left: 50%; animation-delay: 1s; }
+        /* Define positions and delays for 6 fireworks */
+        .fw-1 { top: 15%; left: 20%; animation-delay: 0s; }
+        .fw-2 { top: 25%; left: 40%; animation-delay: 0.3s; }
+        .fw-3 { top: 10%; left: 60%; animation-delay: 0.6s; }
+        .fw-4 { top: 30%; left: 80%; animation-delay: 0.9s; }
+        .fw-5 { top: 20%; left: 50%; animation-delay: 1.2s; }
+        .fw-6 { top: 15%; left: 75%; animation-delay: 1.5s; }
+
         @keyframes explode {
             0% { box-shadow: 0 0 0 0 var(--swa-yellow); opacity: 1; transform: scale(1); }
             50% { 
@@ -137,6 +139,7 @@
         #host-screen { width: 100%; box-sizing: border-box; }
         .host-header-controls { display: flex; justify-content: space-around; align-items: center; margin-bottom: 20px; flex-wrap: wrap;}
         .host-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; text-align: left; }
+        
         .host-panel { background: rgba(0,0,0,0.6); border: 2px solid var(--swa-silver); border-radius: 20px; padding: 15px; height: 350px; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; font-size: 14px; text-shadow: 1px 1px 0 #000; }
         .host-panel::-webkit-scrollbar, #game-layout::-webkit-scrollbar { width: 10px; }
         .host-panel::-webkit-scrollbar-track, #game-layout::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); border-radius: 5px; }
@@ -174,6 +177,9 @@
             <div class="firework fw-1"></div>
             <div class="firework fw-2"></div>
             <div class="firework fw-3"></div>
+            <div class="firework fw-4"></div>
+            <div class="firework fw-5"></div>
+            <div class="firework fw-6"></div>
         </div>
 
         <div class="cloud" style="top: 10%; animation-duration: 60s;"><div class="cloud-shape" style="transform: scale(1.5);"></div></div>
@@ -267,7 +273,7 @@
             </div>
 
             <div id="podium-screen" class="hidden animate-slide" style="width: 100%;">
-                <h2 style="color: var(--swa-yellow); font-size: 30px; margin-bottom: 20px; text-shadow: 3px 3px 0 #000;">🏆 CHAMPION 🏆</h2>
+                <h2 style="color: var(--swa-yellow); font-size: 26px; margin-bottom: 20px; text-shadow: 3px 3px 0 #000;">🛫 You graduated as a PI Pilot - Congratulations 🛫</h2>
                 <ol id="podium"></ol>
                 <br>
                 <div id="restart-container"></div>
@@ -509,10 +515,15 @@
             bgMusic.pause();
             bgMusic.currentTime = 0;
             epicEndingMusic.play().catch(err => console.log("Audio blocked"));
+            
             podium.forEach((p, i) => {
                 let li = document.createElement('li');
-                if (i === 0) li.innerText = `🥇 \n ${p.name} \n ${p.score} PTS`;
-                else li.innerText = `${i+1} PLACE: ${p.name} - ${p.score} PTS`;
+                if (i === 0) {
+                    // UPDATED: Used plane emoji instead of medal
+                    li.innerText = `🛫 \n ${p.name} \n ${p.score} PTS`;
+                } else {
+                    li.innerText = `${i+1} PLACE: ${p.name} - ${p.score} PTS`;
+                }
                 list.appendChild(li);
             });
             const restartContainer = document.getElementById('restart-container');
