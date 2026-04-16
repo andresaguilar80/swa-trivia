@@ -32,10 +32,10 @@
         .plane-landing { top: 10%; right: -100px; animation: planeLanding 30s linear infinite; animation-delay: 10s; }
         @keyframes planeLanding { 0% { transform: translate(0, 0) scaleX(-1) rotate(0deg); opacity: 0; } 5% { opacity: 1; } 40% { transform: translate(-40vw, 10vh) scaleX(-1) rotate(10deg); } 70% { transform: translate(-80vw, 30vh) scaleX(-1) rotate(5deg); } 95% { opacity: 1; } 100% { transform: translate(-110vw, 35vh) scaleX(-1) rotate(0deg); opacity: 0; } }
 
-        #game-layout { position: relative; z-index: 10; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; padding: 20px; box-sizing: border-box; }
+        /* Contenedor principal con scroll en caso de que sea celular */
+        #game-layout { position: relative; z-index: 10; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; padding: 20px; box-sizing: border-box; overflow-y: auto; }
         
-        /* The game card will dynamically expand for the Host */
-        #game-card { background-color: rgba(17, 27, 77, 0.85); backdrop-filter: blur(5px); padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 3px solid var(--swa-yellow); max-width: 500px; width: 100%; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; transition: max-width 0.5s ease; }
+        #game-card { background-color: rgba(17, 27, 77, 0.85); backdrop-filter: blur(5px); padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 3px solid var(--swa-yellow); max-width: 500px; width: 100%; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; transition: max-width 0.5s ease; margin: auto; }
 
         h1 { color: var(--swa-yellow); text-transform: uppercase; letter-spacing: 2px; margin-top: 0; text-shadow: 2px 2px 0 #000; }
 
@@ -73,7 +73,7 @@
         #podium li:nth-child(2) { font-size: 24px; color: var(--swa-silver); text-align: center; border-bottom: none;} 
         #podium li:nth-child(3) { font-size: 20px; color: #cd7f32; text-align: center; border-bottom: none;} 
 
-        /* --- NEW HOST DASHBOARD STYLES --- */
+        /* --- HOST DASHBOARD STYLES --- */
         #host-screen { width: 100%; box-sizing: border-box; }
         .host-header-controls { display: flex; justify-content: space-around; align-items: center; margin-bottom: 20px; flex-wrap: wrap;}
         .host-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; text-align: left; }
@@ -81,6 +81,24 @@
         .host-panel h3 { margin-top: 0; color: var(--swa-yellow); text-align: center; font-size: 18px; border-bottom: 2px solid var(--swa-silver); padding-bottom: 10px; }
         .host-panel ul { list-style: none; padding: 0; margin: 0; }
         .host-panel li { padding: 8px 0; border-bottom: 1px dashed rgba(255,255,255,0.2); }
+
+        /* --- CSS RESPONSIVO PARA CELULARES --- */
+        @media (max-width: 768px) {
+            #game-layout { padding: 10px; align-items: flex-start; } /* Permite scroll natural en celular */
+            #game-card { padding: 15px; border-width: 2px; margin-top: 20px; }
+            h1 { font-size: 22px; }
+            .btn { font-size: 16px; padding: 12px 20px; }
+            #timer { font-size: 45px; }
+            
+            /* Ajustes del Host Dashboard para celular */
+            .host-header-controls { flex-direction: column; gap: 15px; text-align: center; }
+            #start-btn { width: 100%; max-width: 100%; }
+            .host-grid { grid-template-columns: 1fr; /* Apila las 3 columnas en 1 sola */ }
+            .host-panel { height: 250px; /* Reduce un poco la altura en celular para que quepa mejor */ }
+            
+            /* Ajustes de podio para celular */
+            #podium li:nth-child(1) { font-size: 45px; }
+        }
     </style>
 </head>
 <body>
@@ -112,7 +130,7 @@
                         <h2 style="color: var(--swa-yellow); text-shadow: 2px 2px 0 #000; margin: 0;">COMMAND CENTER</h2>
                         <h3 id="player-count" style="margin: 5px 0;">PLAYERS: 0</h3>
                     </div>
-                    <button id="start-btn" class="btn btn-c" onclick="startQuestion()" style="max-width: 250px; margin: 0;">START GAME</button>
+                    <button id="start-btn" class="btn btn-c" onclick="startQuestion()">START GAME</button>
                     <div id="timer-host" class="hidden" style="font-size:24px; color: var(--swa-yellow); font-weight: bold;">Q TIME: <span id="time-left-host">20</span>s</div>
                 </div>
 
@@ -187,10 +205,8 @@
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('host-screen').classList.remove('hidden');
                 
-                // Expand the card to fit the 3-column dashboard
                 document.getElementById('game-card').style.maxWidth = '1000px'; 
                 
-                // Populate the Questions Guide
                 const qList = document.getElementById('host-questions-list');
                 qList.innerHTML = '';
                 data.questions.forEach((q, i) => {
@@ -228,7 +244,6 @@
             if(isHost) {
                 document.getElementById('player-count').innerText = `PLAYERS: ${players.length}`;
                 
-                // Update Live Users & Status
                 const userList = document.getElementById('host-user-list');
                 userList.innerHTML = '';
                 players.forEach(p => {
@@ -237,7 +252,6 @@
                     userList.appendChild(li);
                 });
 
-                // Update Live Ranking
                 const sorted = [...players].sort((a,b) => b.score - a.score).slice(0, 10);
                 const liveRank = document.getElementById('host-live-leaderboard');
                 liveRank.innerHTML = '';
@@ -368,7 +382,6 @@
 
             const restartContainer = document.getElementById('restart-container');
             if (isHost) {
-                // Ensure card stays wide for Host at the end to fit the button nicely
                 document.getElementById('game-card').style.maxWidth = '1000px';
                 restartContainer.innerHTML = '<button class="btn btn-c" onclick="restartGame()" style="max-width: 250px;">RESTART GAME</button>';
             } else {
