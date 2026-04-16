@@ -7,11 +7,11 @@
     <style>
         /* SWA Color Palette */
         :root {
-            --swa-blue: #111b4d; /* Heart Blue (Fuselage) */
-            --swa-red: #E8112d;  /* Warm Red (Tail Stripe) */
-            --swa-yellow: #F7D116; /* Sunrise Yellow (Tail Stripe) */
-            --swa-light-blue: #304CB2; /* Bold Blue */
-            --swa-silver: #A7A9AC; /* Silver (Wings) */
+            --swa-blue: #111b4d; 
+            --swa-red: #E8112d;  
+            --swa-yellow: #F7D116; 
+            --swa-light-blue: #304CB2; 
+            --swa-silver: #A7A9AC; 
             --retro-sky-top: #4d88ff;
             --retro-sky-bot: #99c2ff;
         }
@@ -22,15 +22,15 @@
             padding: 0;
             width: 100%;
             height: 100%;
-            overflow: hidden; /* Keep background contained */
-            font-family: 'Courier New', Courier, monospace; /* Retro feel font */
+            overflow: hidden; 
+            font-family: 'Courier New', Courier, monospace; 
             background-color: var(--swa-blue);
         }
 
         body { 
             display: flex;
-            justify-content: center; /* Horizontal centering */
-            align-items: center;    /* Vertical centering */
+            justify-content: center; 
+            align-items: center;    
             color: white; 
             text-align: center; 
         }
@@ -41,7 +41,7 @@
             top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(to bottom, var(--retro-sky-top), var(--retro-sky-bot) 70%, #d9d9d9 70%, #999999 71%, #333333 71%);
             z-index: 0;
-            image-rendering: pixelated; /* Crucial for 8-bit look */
+            image-rendering: pixelated; 
         }
 
         /* Pixel Cloud Generator */
@@ -49,7 +49,6 @@
             position: absolute;
             background: white;
             width: 20px; height: 20px;
-            /* Box-shadows create pixel shapes */
             box-shadow: -20px 0 white, 20px 0 white, 0 -20px white, 0 20px white, 
                         -40px 20px white, 40px 20px white, -20px 40px white, 20px 40px white;
             opacity: 0.8;
@@ -78,29 +77,24 @@
             position: absolute;
             width: 80px; height: 20px;
             z-index: 1;
-            /* Simple silhouette initially */
         }
         
-        /* Plane Body */
         .plane::before {
             content: ''; position: absolute; left: 0; top: 5px;
-            width: 60px; height: 10px; background: var(--swa-blue); /* Fuselage */
-            box-shadow: 5px -5px var(--swa-blue); /* Nose */
+            width: 60px; height: 10px; background: var(--swa-blue); 
+            box-shadow: 5px -5px var(--swa-blue); 
         }
         
-        /* Plane Tail & Wings (SWA Colors) */
         .plane::after {
             content: ''; position: absolute; right: 0; top: 0;
             width: 15px; height: 20px;
-            /* Tail Stripes: Red, Yellow, Blue */
             background: linear-gradient(to bottom, 
                 var(--swa-red) 33%, 
                 var(--swa-yellow) 33% 66%, 
                 var(--swa-blue) 66%);
-            box-shadow: -35px 15px var(--swa-silver), -50px 15px var(--swa-silver); /* Wings */
+            box-shadow: -35px 15px var(--swa-silver), -50px 15px var(--swa-silver); 
         }
 
-        /* Animation: Takeoff */
         .plane-takeoff {
             bottom: 35%; left: -100px;
             animation: planeTakeoff 25s linear infinite;
@@ -114,7 +108,6 @@
             100% { transform: translate(110vw, -45vh) rotate(-20deg); opacity: 0; }
         }
 
-        /* Animation: Landing */
         .plane-landing {
             top: 10%; right: -100px;
             animation: planeLanding 30s linear infinite;
@@ -132,7 +125,7 @@
         /* --- GAME CONTENT CONTAINER --- */
         #game-layout {
             position: relative;
-            z-index: 10; /* Above background */
+            z-index: 10; 
             display: flex;
             justify-content: center;
             align-items: center;
@@ -142,8 +135,7 @@
         }
 
         #game-card {
-            /* Semi-transparent blur container */
-            background-color: rgba(17, 27, 77, 0.85); /* SWA Blue with alpha */
+            background-color: rgba(17, 27, 77, 0.85); 
             backdrop-filter: blur(5px);
             padding: 30px;
             border-radius: 15px;
@@ -159,7 +151,6 @@
 
         h1 { color: var(--swa-yellow); text-transform: uppercase; letter-spacing: 2px; margin-top: 0; }
 
-        /* General Animations */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); color: var(--swa-red); } 100% { transform: scale(1); } }
@@ -167,15 +158,14 @@
         .animate-fade { animation: fadeIn 0.8s ease-out forwards; }
         .animate-slide { animation: slideDown 0.6s ease-out forwards; }
 
-        /* --- Buttons & Inputs --- */
         .btn { 
             font-family: 'Courier New', Courier, monospace;
             padding: 15px 30px; 
             margin: 10px; 
             font-size: 18px; 
             cursor: pointer; 
-            border: 4px solid white; /* Retro border */
-            border-radius: 0; /* Retro sharp corners */
+            border: 4px solid white; 
+            border-radius: 0; 
             font-weight: bold; 
             transition: all 0.2s ease;
             box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
@@ -193,11 +183,9 @@
 
         .hidden { display: none !important; }
 
-        /* Timer */
         #timer { font-size: 60px; font-weight: bold; color: var(--swa-yellow); margin: 15px; transition: color 0.3s; text-shadow: 4px 4px 0 rgba(0,0,0,0.5); }
         .timer-warning { animation: pulse 1s infinite; color: var(--swa-red) !important; }
 
-        /* Forms */
         input { font-family: 'Courier New', Courier, monospace; padding: 15px; font-size: 18px; border-radius: 0; border: 4px solid var(--swa-yellow); background: rgba(0,0,0,0.3); color: white; text-align: center; width: 100%; max-width: 300px; outline: none; box-sizing: border-box;}
         input:focus { border-color: var(--swa-red); }
 
@@ -212,7 +200,6 @@
             box-sizing: border-box;
         }
 
-        /* Leaderboard */
         #leaderboard, #podium { 
             font-size: 20px; 
             text-align: left; 
@@ -224,10 +211,23 @@
             border-radius: 8px; 
             border: 2px solid var(--swa-silver);
             box-sizing: border-box;
+            list-style: none;
+            padding-left: 20px;
         }
         #leaderboard li, #podium li { margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px; list-style-position: inside; }
-        #podium li:nth-child(1) { font-size: 26px; color: var(--swa-yellow); font-weight: bold; } 
-        #podium li:nth-child(2) { font-size: 22px; color: var(--swa-silver); } 
+        
+        /* NEW STYLES FOR THE WINNER */
+        #podium li:nth-child(1) { 
+            font-size: 50px; 
+            color: var(--swa-yellow); 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            text-shadow: 3px 3px 0 rgba(0,0,0,0.8);
+            line-height: 1.2;
+            margin-bottom: 30px;
+            text-align: center;
+        } 
+        #podium li:nth-child(2) { font-size: 24px; color: var(--swa-silver); } 
         #podium li:nth-child(3) { font-size: 20px; color: #cd7f32; } 
 
         #host-screen { background: rgba(0,0,0,0.4); padding: 20px; border-radius: 10px; width: 100%; box-sizing: border-box;}
@@ -309,6 +309,16 @@
         let isHost = false;
         let timerInterval;
 
+        // --- NEW AUDIO LOGIC ---
+        // Browsers require these files to be loaded. You will need to put "bg-music.mp3" 
+        // and "victory-music.mp3" in your public folder alongside this HTML file.
+        const bgMusic = new Audio('/bg-music.mp3');
+        bgMusic.loop = true;
+        bgMusic.volume = 0.5;
+
+        const victoryMusic = new Audio('/victory-music.mp3');
+        victoryMusic.volume = 0.8;
+
         function joinGame() {
             const name = document.getElementById('username').value.trim();
             if(!name) return alert('Enter your name to board!');
@@ -352,6 +362,11 @@
                 document.getElementById('opt3').innerText = `D) ${data.question.options[3]}`;
                 document.getElementById('options').classList.remove('hidden');
                 document.getElementById('wait-msg').classList.add('hidden');
+
+                // Start playing background music if not already playing
+                if (bgMusic.paused) {
+                    bgMusic.play().catch(err => console.log("Audio autoplay blocked by browser until user interacts."));
+                }
             }
             startTimer();
         });
@@ -395,9 +410,9 @@
             document.getElementById('leaderboard-screen').classList.remove('hidden');
             const list = document.getElementById('leaderboard');
             list.innerHTML = '';
-            top10.forEach(p => {
+            top10.forEach((p, index) => {
                 let li = document.createElement('li');
-                li.innerText = `${p.name} - ${p.score} pts`;
+                li.innerText = `${index + 1}. ${p.name} - ${p.score} pts`;
                 list.appendChild(li);
             });
 
@@ -425,9 +440,22 @@
             document.getElementById('podium-screen').classList.remove('hidden');
             const list = document.getElementById('podium');
             list.innerHTML = '';
+            
+            // Stop game music and play victory music
+            bgMusic.pause();
+            bgMusic.currentTime = 0;
+            if (!isHost) {
+                victoryMusic.play().catch(err => console.log("Audio playback blocked by browser"));
+            }
+
             podium.forEach((p, i) => {
                 let li = document.createElement('li');
-                li.innerText = `${i+1} Place: ${p.name} - ${p.score} pts`;
+                if (i === 0) {
+                    // Winner text formatting handled by CSS now
+                    li.innerText = `🥇 ${p.name} \n ${p.score} PTS`;
+                } else {
+                    li.innerText = `${i+1} Place: ${p.name} - ${p.score} pts`;
+                }
                 list.appendChild(li);
             });
         });
