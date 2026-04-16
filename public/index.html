@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SWA Retro Trivia: Ultimate</title>
+    <title>SWA Retro Trivia: Airport Hub</title>
     <style>
         :root {
             --swa-blue: #111b4d; 
@@ -11,7 +11,6 @@
             --swa-yellow: #F7D116; 
             --swa-light-blue: #304CB2; 
             --swa-silver: #A7A9AC; 
-            /* NEW NIGHT SKY GRADIENT */
             --retro-sky-top: #0d122b;
             --retro-sky-mid: #1a2a6c;
             --retro-sky-bot: #5b3e75;
@@ -32,78 +31,96 @@
         #timer { font-size: 60px; font-weight: bold; color: var(--swa-yellow); margin: 15px; transition: color 0.3s; text-shadow: 4px 4px 0 rgba(0,0,0,0.8); }
         input { font-family: 'Courier New', Courier, monospace; padding: 15px; font-size: 18px; border: 4px solid var(--swa-yellow); background: rgba(0,0,0,0.5); color: white; text-align: center; width: 100%; max-width: 300px; text-transform: uppercase;}
 
-        /* --- ULTIMATE 8-BIT BACKGROUND --- */
+        /* --- ADVANCED 8-BIT BACKGROUND --- */
         .retro-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, var(--retro-sky-top), var(--retro-sky-mid) 40%, var(--retro-sky-bot) 70%, #d9d9d9 70%, #999999 71%, var(--ground-gray) 71%); z-index: 0; image-rendering: pixelated; }
 
-        /* STARS */
+        /* NIGHT SKY & CLUTTER (Same as before) */
         .star { position: absolute; background: white; width: 2px; height: 2px; border-radius: 50%; animation: twinkle 3s infinite; }
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; transform: scale(1.2); } }
-
-        /* MOON */
-        .moon { position: absolute; top: 5%; right: 10%; width: 40px; height: 40px; background: var(--swa-yellow); border-radius: 50%; box-shadow: -10px 0 0 0 var(--retro-sky-top); } /* Simple CSS crescent */
-
-        /* CLOUDS (Increased) */
+        .moon { position: absolute; top: 5%; right: 10%; width: 40px; height: 40px; background: var(--swa-yellow); border-radius: 50%; box-shadow: -10px 0 0 0 var(--retro-sky-top); }
         .cloud { position: absolute; background: white; opacity: 0.6; animation: moveClouds linear infinite; }
         .cloud-shape { width: 20px; height: 20px; box-shadow: -20px 0 white, 20px 0 white, 0 -20px white, 0 20px white, -40px 20px white, 40px 20px white, -20px 40px white, 20px 40px white; }
         @keyframes moveClouds { from { transform: translateX(110vw); } to { transform: translateX(-60vw); } }
-
-        /* AIRPORT GROUND EFFECTS */
-        .terminal { position: absolute; bottom: 29%; left: 10%; width: 120px; height: 70px; background: #666; box-shadow: 20px -20px #666, 150px 0 #666, 170px 0 #666; }
-        .terminal-window { position: absolute; top: 10px; left: 10px; width: 10px; height: 10px; background: #ffff99; box-shadow: 20px 0 #ffff99, 40px 0 #ffff99, 150px 0 #ffff99; animation: lightsOn infinite 5s; }
-        @keyframes lightsOn { 0%, 40%, 100% { opacity: 1; } 50%, 90% { opacity: 0.2; } }
-
-        /* BIRDS */
         .bird-flock { position: absolute; width: 50px; height: 30px; animation: moveFlock linear infinite; }
         .bird { position: absolute; background: black; width: 4px; height: 2px; box-shadow: -4px -2px black, 4px -2px black; animation: birdFlap 0.4s infinite; }
         @keyframes birdFlap { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
         @keyframes moveFlock { from { transform: translateX(110vw) translateY(0); } to { transform: translateX(-50vw) translateY(5vh); } }
 
-        /* SWA PLANES (Increased Density & Sizes) */
-        .plane { position: absolute; z-index: 1; image-rendering: pixelated;}
-        .plane::before { content: ''; position: absolute; background: var(--swa-blue); } /* Body */
-        .plane::after { content: ''; position: absolute; } /* Tail/Wings */
-
-        /* Plane Base Art Rules */
-        .plane.swa-livery::after { background: linear-gradient(to bottom, var(--swa-red) 33%, var(--swa-yellow) 33% 66%, var(--swa-blue) 66%); }
-
-        /* Plane Animations */
-        @keyframes planeTakeoff { 0% { transform: translate(0, 0) rotate(0deg); opacity: 0; } 5% { opacity: 1; } 30% { transform: translate(40vw, -10vh) rotate(-15deg); } 100% { transform: translate(120vw, -50vh) rotate(-20deg); opacity: 0; } }
-        @keyframes planeLanding { 0% { transform: translate(0, 0) scaleX(-1) rotate(0deg); opacity: 0; } 5% { opacity: 1; } 70% { transform: translate(-80vw, 30vh) scaleX(-1) rotate(5deg); } 100% { transform: translate(-120vw, 35vh) scaleX(-1) rotate(0deg); opacity: 0; } }
-
-        /* Large Planes (Foreground) */
-        .plane-lg { width: 120px; height: 30px; }
-        .plane-lg::before { left: 0; top: 8px; width: 90px; height: 14px; box-shadow: 7px -7px var(--swa-blue); }
-        .plane-lg::after { right: 0; top: 0; width: 22px; height: 30px; box-shadow: -50px 22px var(--swa-silver), -70px 22px var(--swa-silver); }
-
-        /* Medium Planes */
-        .plane-md { width: 80px; height: 20px; }
-        .plane-md::before { left: 0; top: 5px; width: 60px; height: 10px; box-shadow: 5px -5px var(--swa-blue); }
-        .plane-md::after { right: 0; top: 0; width: 15px; height: 20px; box-shadow: -35px 15px var(--swa-silver), -50px 15px var(--swa-silver); }
-
-        /* UFO (Fast & Retro) */
+        /* UFO */
         .ufo { position: absolute; top: 20%; left: -100px; width: 50px; height: 20px; z-index: 2; animation: ufoZip 12s linear infinite; animation-delay: 5s; }
         .ufo-body { position: absolute; width: 50px; height: 12px; background: #999; border-radius: 50px; top: 4px; box-shadow: inset -5px -5px 0 rgba(0,0,0,0.3); }
         .ufo-dome { position: absolute; width: 20px; height: 10px; background: #66ff66; border-radius: 50px 50px 0 0; top: -4px; left: 15px; opacity: 0.8; }
         .ufo-lights { position: absolute; bottom: 1px; left: 10px; width: 5px; height: 5px; background: var(--swa-red); border-radius: 50%; box-shadow: 10px 0 var(--swa-yellow), 20px 0 var(--swa-red), 30px 0 var(--swa-yellow); animation: blinkUfo 0.3s infinite; }
         @keyframes blinkUfo { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-        @keyframes ufoZip { 0% { transform: translateX(0) translateY(0); } 10% { transform: translateX(20vw) translateY(-5vh); } 20% { transform: translateX(50vw) translateY(5vh); } 30% { transform: translateX(120vw) translateY(0); } 100% { transform: translateX(120vw); } } /* Faster zip, then long wait */
+        @keyframes ufoZip { 0% { transform: translateX(0) translateY(0); } 10% { transform: translateX(20vw) translateY(-5vh); } 20% { transform: translateX(50vw) translateY(5vh); } 30% { transform: translateX(120vw) translateY(0); } 100% { transform: translateX(120vw); } }
 
-        /* --- SROLLBARS (Same as before) --- */
-        .host-panel::-webkit-scrollbar, #game-layout::-webkit-scrollbar { width: 10px; }
-        .host-panel::-webkit-scrollbar-track, #game-layout::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); }
-        .host-panel::-webkit-scrollbar-thumb, #game-layout::-webkit-scrollbar-thumb { background: var(--swa-yellow); border: 1px solid var(--swa-blue); }
-        .host-panel::-webkit-scrollbar-thumb:hover, #game-layout::-webkit-scrollbar-thumb:hover { background: var(--swa-red); }
+        /* SWA PLANES ART & LIVERY */
+        .plane { position: absolute; z-index: 1; image-rendering: pixelated;}
+        .plane::before { content: ''; position: absolute; background: var(--swa-blue); } /* Body */
+        .plane::after { content: ''; position: absolute; } /* Tail/Wings */
+        
+        /* Reuse livery gradient */
+        .swa-livery-tail { background: linear-gradient(to bottom, var(--swa-red) 33%, var(--swa-yellow) 33% 66%, var(--swa-blue) 66%); }
 
-        /* --- HOST/GAME LAYOUTS (Same as before) --- */
-        #host-screen { width: 100%; box-sizing: border-box; }
-        .host-header-controls { display: flex; justify-content: space-around; align-items: center; margin-bottom: 20px; flex-wrap: wrap;}
-        .host-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; text-align: left; }
-        .host-panel { background: rgba(0,0,0,0.6); border: 2px solid var(--swa-silver); padding: 15px; height: 350px; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; font-size: 14px; text-shadow: 1px 1px 0 #000; }
-        .host-panel h3 { margin-top: 0; color: var(--swa-yellow); text-align: center; font-size: 18px; border-bottom: 2px solid var(--swa-silver); padding-bottom: 10px; }
-        .host-panel ul { list-style: none; padding: 0; margin: 0; }
-        .host-panel li { padding: 8px 0; border-bottom: 1px dashed rgba(255,255,255,0.2); }
+        /* Medium Plane Art */
+        .plane-md { width: 80px; height: 20px; }
+        .plane-md::before { left: 0; top: 5px; width: 60px; height: 10px; box-shadow: 5px -5px var(--swa-blue); }
+        .plane-md::after { right: 0; top: 0; width: 15px; height: 20px; box-shadow: -35px 15px var(--swa-silver), -50px 15px var(--swa-silver); }
 
-        /* Responsiveness */
+        /* Large Plane Art */
+        .plane-lg { width: 120px; height: 30px; }
+        .plane-lg::before { left: 0; top: 8px; width: 90px; height: 14px; box-shadow: 7px -7px var(--swa-blue); }
+        .plane-lg::after { right: 0; top: 0; width: 22px; height: 30px; box-shadow: -50px 22px var(--swa-silver), -70px 22px var(--swa-silver); }
+
+        /* --- PARKED PLANES AT HUB --- */
+        .parked-planes-container { position: absolute; bottom: 29%; left: 10%; width: 400px; display: flex; gap: 40px; }
+        
+        .static-plane { position: relative; width: 80px; height: 30px; transform: scaleX(-1); } /* Static md plane facing gate */
+        .static-plane::before { content: ''; position: absolute; background: var(--swa-blue); left: 0; top: 15px; width: 60px; height: 10px; box-shadow: 5px -5px var(--swa-blue); }
+        .static-plane::after { content: ''; position: absolute; right: 0; top: 10px; width: 15px; height: 20px; box-shadow: -35px 15px var(--swa-silver), -50px 15px var(--swa-silver); }
+        
+        .jet-bridge { position: absolute; background: #888; width: 15px; height: 5px; top: 20px; left: 55px; box-shadow: 1px 1px 0 #000; }
+
+        /* --- GROUND INFRASTRUCTURE --- */
+        /* HUB/TERMINAL (Expanded) */
+        .terminal-hub { position: absolute; bottom: 29%; left: 10%; width: 450px; height: 60px; background: #666; border-top: 4px solid var(--swa-silver); box-shadow: 6px 6px 0 rgba(0,0,0,0.4); }
+        .hub-windows { position: absolute; top: 10px; left: 10px; width: 10px; height: 10px; background: #ffff99; box-shadow: 20px 0 #ffff99, 40px 0 #ffff99, 100px 0 #ffff99, 120px 0 #ffff99, 200px 0 #ffff99, 220px 0 #ffff99, 300px 0 #ffff99, 320px 0 #ffff99; animation: lightsOn 5s infinite; }
+
+        /* CONTROL TOWER */
+        .control-tower { position: absolute; bottom: 29%; left: 5%; width: 30px; height: 100px; background: #555; border: 2px solid #333; }
+        .tower-cab { position: absolute; top: 0; left: -5px; width: 40px; height: 25px; background: #666; border: 2px solid #333; }
+        .tower-windows { position: absolute; top: 5px; left: 5px; width: 5px; height: 10px; background: #ffff99; box-shadow: 10px 0 #ffff99, 20px 0 #ffff99; }
+
+        @keyframes lightsOn { 0%, 40%, 100% { opacity: 1; } 50%, 90% { opacity: 0.2; } }
+
+        /* --- ACTIVE GROUND ANIMATIONS --- */
+        /* TAKE OFF FROM GROUND (Left to Right) */
+        @keyframes groundTakeoff { 
+            0% { transform: translate(0, 0) rotate(0deg); bottom: 29%; left: -100px; opacity: 0; } /* Starting point far left on ground */
+            5% { opacity: 1; }
+            10% { transform: translate(10vw, 0) rotate(0deg); bottom: 29%; } /* Rolling/Taxi */
+            30% { transform: translate(40vw, 0) rotate(0deg); bottom: 29%; } /* Accelerating along ground */
+            50% { transform: translate(60vw, 1vh) rotate(-10deg); bottom: 31%; } /* Lifting nose (V1) */
+            80% { transform: translate(90vw, 20vh) rotate(-18deg); bottom: 50%; } /* Climbing */
+            100% { transform: translate(130vw, 40vh) rotate(-20deg); bottom: 70%; opacity: 0; } /* Gone */
+        }
+
+        /* LANDING ON GROUND (Right to Left) */
+        @keyframes groundLanding { 
+            0% { transform: translate(0, 0) scaleX(-1) rotate(10deg); top: 5%; right: -100px; opacity: 0; } /* Descending from top right */
+            5% { opacity: 1; }
+            40% { transform: translate(-40vw, 15vh) scaleX(-1) rotate(6deg); top: 25%; }
+            65% { transform: translate(-75vw, 66vh) scaleX(-1) rotate(2deg); top: 66%; } /* Touchdown Point */
+            70% { transform: translate(-80vw, 66.5vh) scaleX(-1) rotate(0deg); top: 66.5%; } /* Ground Level Strictly */
+            95% { transform: translate(-110vw, 66.5vh) scaleX(-1) rotate(0deg); top: 66.5%; opacity: 1; } /* Rolling out */
+            100% { transform: translate(-130vw, 66.5vh) scaleX(-1) rotate(0deg); top: 66.5%; opacity: 0; } /* Exiting Runway */
+        }
+
+        /* Assign animations to active ground fleet */
+        .ground-takeoff { animation: groundTakeoff linear infinite; z-index: 2; }
+        .ground-landing { animation: groundLanding linear infinite; z-index: 2; }
+
+        /* Responsiveness (Dashboards unchanged) */
         @media (max-width: 768px) {
             #game-layout { padding: 10px; align-items: flex-start; } 
             #game-card { padding: 15px; border-width: 2px; margin-top: 20px; margin-bottom: 40px; }
@@ -113,6 +130,13 @@
             .host-header-controls { flex-direction: column; gap: 15px; text-align: center; }
             .host-grid { grid-template-columns: 1fr; }
             .host-panel { height: 280px; } 
+            
+            /* Ground clutter adjustments for mobile */
+            .terminal-hub { width: 300px; }
+            .parked-planes-container { width: 250px; gap: 20px; left: 15%; }
+            .static-plane { transform: scale(0.7) scaleX(-1); }
+            @keyframes groundTakeoff { 0% { bottom: 29%; left: -100px; } 100% { transform: translate(110vw, 20vh) rotate(-20deg); bottom: 50%; opacity: 0; } }
+            @keyframes groundLanding { 0% { top: 5%; right: -100px; } 100% { transform: translate(-110vw, 66.5vh) scaleX(-1) rotate(0deg); top: 66.5%; opacity: 0; } }
         }
     </style>
 </head>
@@ -122,20 +146,9 @@
         <div class="moon"></div>
         <div id="stars-container"></div>
 
-        <div class="cloud" style="top: 10%; animation-duration: 60s; animation-delay: -10s;"><div class="cloud-shape" style="transform: scale(1.5);"></div></div>
-        <div class="cloud" style="top: 25%; animation-duration: 45s; animation-delay: -30s;"><div class="cloud-shape"></div></div>
-        <div class="cloud" style="top: 15%; animation-duration: 80s; animation-delay: -50s; opacity: 0.3;"><div class="cloud-shape" style="transform: scale(2);"></div></div>
-        <div class="cloud" style="top: 35%; animation-duration: 50s; animation-delay: -5s;"><div class="cloud-shape" style="transform: scale(0.8);"></div></div>
-        
-        <div class="bird-flock" style="top: 20%; animation-duration: 30s;">
-            <div class="bird" style="top: 0; left: 0;"></div>
-            <div class="bird" style="top: 10px; left: 15px; animation-delay: 0.1s;"></div>
-            <div class="bird" style="top: -5px; left: 30px; animation-delay: 0.2s;"></div>
-        </div>
-        <div class="bird-flock" style="top: 40%; animation-duration: 25s; animation-delay: 10s; transform: scale(0.6);">
-            <div class="bird" style="top: 0; left: 0;"></div>
-            <div class="bird" style="top: 10px; left: 20px; animation-delay: 0.1s;"></div>
-        </div>
+        <div class="cloud" style="top: 10%; animation-duration: 60s;"><div class="cloud-shape" style="transform: scale(1.5);"></div></div>
+        <div class="cloud" style="top: 25%; animation-duration: 45s; animation-delay: -10s;"><div class="cloud-shape"></div></div>
+        <div class="bird-flock" style="top: 20%; animation-duration: 30s;"><div class="bird"></div><div class="bird" style="top: 10px; left: 15px;"></div></div>
 
         <div class="ufo">
             <div class="ufo-dome"></div>
@@ -143,16 +156,37 @@
             <div class="ufo-lights"></div>
         </div>
 
-        <div class="plane plane-md swa-livery plane-takeoff" style="bottom: 35%; animation-duration: 25s; animation-delay: -5s; transform: scale(0.5); opacity: 0.5;"></div>
-        <div class="plane plane-md swa-livery plane-landing" style="top: 15%; animation-duration: 30s; animation-delay: -15s; transform: scale(0.6) scaleX(-1); opacity: 0.6;"></div>
+        <div class="terminal-hub">
+            <div class="hub-windows"></div>
+        </div>
+        
+        <div class="control-tower">
+            <div class="tower-cab">
+                <div class="tower-windows"></div>
+            </div>
+        </div>
 
-        <div class="plane plane-md swa-livery plane-takeoff" style="bottom: 35%; animation-duration: 20s; animation-delay: 2s;"></div>
-        <div class="plane plane-md swa-livery plane-landing" style="top: 10%; animation-duration: 25s; animation-delay: 12s;"></div>
+        <div class="parked-planes-container">
+            <div class="gate-slot">
+                <div class="jet-bridge"></div>
+                <div class="static-plane swa-livery-tail"></div>
+            </div>
+            <div class="gate-slot">
+                <div class="jet-bridge"></div>
+                <div class="static-plane swa-livery-tail"></div>
+            </div>
+            <div class="gate-slot">
+                <div class="jet-bridge"></div>
+                <div class="static-plane swa-livery-tail"></div>
+            </div>
+        </div>
 
-        <div class="plane plane-lg swa-livery plane-takeoff" style="bottom: 32%; left: -150px; animation-duration: 15s; animation-delay: 8s; z-index: 2;"></div>
-        <div class="plane plane-lg swa-livery plane-landing" style="top: 5%; right: -150px; animation-duration: 18s; animation-delay: 20s; z-index: 2;"></div>
+        <div class="plane plane-lg swa-livery-tail ground-takeoff" style="animation-duration: 18s;"></div>
 
-        <div class="terminal"><div class="terminal-window"></div></div>
+        <div class="plane plane-md swa-livery-tail ground-takeoff" style="animation-duration: 22s; animation-delay: 10s;"></div>
+
+        <div class="plane plane-lg swa-livery-tail ground-landing" style="animation-duration: 25s; animation-delay: 5s;"></div>
+
     </div>
 
     <div id="game-layout">
@@ -231,7 +265,6 @@
         let isHost = false;
         let timerInterval;
 
-        // Audio setup (ensure files exist in public folder)
         const bgMusic = new Audio('/8bit-loop.mp3');
         bgMusic.loop = true;
         bgMusic.volume = 0.4; 
@@ -239,22 +272,19 @@
         const epicEndingMusic = new Audio('/punch-out-ending.mp3');
         epicEndingMusic.volume = 0.9; 
 
-        // --- BACKGROUND GENERATORS ---
         function generateStars() {
             const container = document.getElementById('stars-container');
-            const starCount = 50;
-            for (let i = 0; i < starCount; i++) {
+            for (let i = 0; i < 40; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
-                star.style.top = Math.random() * 65 + '%'; // Only in top portion of sky
+                star.style.top = Math.random() * 65 + '%'; 
                 star.style.left = Math.random() * 100 + '%';
                 star.style.animationDelay = Math.random() * 3 + 's';
                 container.appendChild(star);
             }
         }
-        generateStars(); // Run immediately
+        generateStars();
 
-        // --- GAME LOGIC (Unchanged) ---
         function becomeHost() {
             socket.emit('claimHost');
         }
@@ -289,10 +319,7 @@
             document.getElementById('game-screen').classList.remove('hidden');
             document.getElementById('question-box').classList.remove('hidden');
             document.getElementById('question-text').innerText = "WAITING FOR HOST TO START...";
-            
-            if (!isHost) {
-                 bgMusic.play().catch(e => console.log("Waiting for interaction"));
-            }
+            if (!isHost) bgMusic.play().catch(e => console.log("Audio blocked"));
         });
 
         socket.on('joinError', (errorMsg) => {
@@ -302,7 +329,6 @@
         socket.on('updatePlayers', (players) => {
             if(isHost) {
                 document.getElementById('player-count').innerText = `PLAYERS: ${players.length}`;
-                
                 const userList = document.getElementById('host-user-list');
                 userList.innerHTML = '';
                 players.forEach(p => {
@@ -310,7 +336,6 @@
                     li.innerText = p.name + (p.hasAnswered ? " ✅" : " ⏳");
                     userList.appendChild(li);
                 });
-
                 const sorted = [...players].sort((a,b) => b.score - a.score).slice(0, 10);
                 const liveRank = document.getElementById('host-live-leaderboard');
                 liveRank.innerHTML = '';
@@ -323,24 +348,20 @@
         });
 
         function startQuestion() {
-            const startBtn = document.getElementById('start-btn');
-            if (startBtn) startBtn.classList.add('hidden'); 
-            
-            if (isHost && bgMusic.paused) {
-                bgMusic.play().catch(e => console.log("Waiting for interaction"));
+            if (isHost) {
+                if (bgMusic.paused) bgMusic.play().catch(e => console.log("Audio blocked"));
+                const startBtn = document.getElementById('start-btn');
+                if (startBtn) startBtn.classList.add('hidden'); 
+                socket.emit('startQuestion');
             }
-            
-            socket.emit('startQuestion');
         }
 
         socket.on('newQuestion', (data) => {
             document.getElementById('leaderboard-screen').classList.add('hidden');
-            
             const qBox = document.getElementById('question-box');
             qBox.classList.remove('animate-slide');
             void qBox.offsetWidth; 
             qBox.classList.add('animate-slide');
-
             if(!isHost) {
                 document.getElementById('game-screen').classList.remove('hidden');
                 document.getElementById('question-box').classList.remove('hidden');
@@ -365,13 +386,11 @@
             let timeLeft = 20;
             const timerEl = document.getElementById('timer');
             timerEl.classList.remove('timer-warning');
-            
             if(!isHost) timerEl.innerText = timeLeft;
             if(isHost) {
                 document.getElementById('timer-host').classList.remove('hidden');
                 document.getElementById('time-left-host').innerText = timeLeft;
             }
-            
             clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 timeLeft--;
@@ -380,7 +399,6 @@
                     if(timeLeft <= 5) timerEl.classList.add('timer-warning'); 
                 }
                 if(isHost) document.getElementById('time-left-host').innerText = timeLeft;
-                
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
                     timerEl.classList.remove('timer-warning');
@@ -399,16 +417,13 @@
                 li.innerText = `${index + 1}. ${p.name} - ${p.score} PTS`;
                 list.appendChild(li);
             });
-
             let boardTimeLeft = 10;
             const lbTimerEl = document.getElementById('leaderboard-timer');
             lbTimerEl.innerText = `NEXT IN: ${boardTimeLeft}s`;
-            
             clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 boardTimeLeft--;
                 lbTimerEl.innerText = `NEXT IN: ${boardTimeLeft}s`;
-                
                 if (boardTimeLeft <= 0) {
                     clearInterval(timerInterval);
                     if (isHost) startQuestion(); 
@@ -424,21 +439,15 @@
             document.getElementById('podium-screen').classList.remove('hidden');
             const list = document.getElementById('podium');
             list.innerHTML = '';
-            
             bgMusic.pause();
             bgMusic.currentTime = 0;
             epicEndingMusic.play().catch(err => console.log("Audio blocked"));
-
             podium.forEach((p, i) => {
                 let li = document.createElement('li');
-                if (i === 0) {
-                    li.innerText = `🥇 \n ${p.name} \n ${p.score} PTS`;
-                } else {
-                    li.innerText = `${i+1} PLACE: ${p.name} - ${p.score} PTS`;
-                }
+                if (i === 0) li.innerText = `🥇 \n ${p.name} \n ${p.score} PTS`;
+                else li.innerText = `${i+1} PLACE: ${p.name} - ${p.score} PTS`;
                 list.appendChild(li);
             });
-
             const restartContainer = document.getElementById('restart-container');
             if (isHost) {
                 document.getElementById('game-card').style.maxWidth = '1000px';
@@ -449,16 +458,14 @@
         });
 
         function restartGame() {
-            socket.emit('restartGame');
+            if (isHost) socket.emit('restartGame');
         }
 
         socket.on('gameReset', () => {
             epicEndingMusic.pause();
             epicEndingMusic.currentTime = 0;
             clearInterval(timerInterval);
-
             document.getElementById('podium-screen').classList.add('hidden');
-            
             if (isHost) {
                 document.getElementById('host-screen').classList.remove('hidden');
                 document.getElementById('start-btn').classList.remove('hidden'); 
@@ -468,7 +475,6 @@
                 document.getElementById('options').classList.add('hidden');
                 document.getElementById('wait-msg').classList.add('hidden');
                 document.getElementById('timer').innerText = "20";
-                
                 bgMusic.play().catch(e => console.log("Audio blocked"));
             }
         });
