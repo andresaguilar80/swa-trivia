@@ -29,19 +29,20 @@ const questions = [
 
 io.on('connection', (socket) => {
     
+    // Broadcast if host button should be hidden for new users
     socket.emit('hostStatus', !!hostSocketId);
 
-    // NEW: Security check for admin username
+    // Validate Host Credential
     socket.on('claimHost', (adminName) => {
         if (adminName !== "andresaguilar80") {
-            socket.emit('hostClaimed', { success: false, message: "Invalid admin credentials." });
+            socket.emit('hostClaimed', { success: false, message: "INVALID CREDENTIALS." });
             return;
         }
 
         if (!hostSocketId) {
             hostSocketId = socket.id;
             socket.emit('hostClaimed', { success: true, questions: questions });
-            io.emit('hostStatus', true); 
+            io.emit('hostStatus', true); // Hide button for everyone else
         } else {
             socket.emit('hostClaimed', { success: false, message: "Another user is already hosting this game!" });
         }
@@ -124,7 +125,7 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         if (socket.id === hostSocketId) {
             hostSocketId = null; 
-            io.emit('hostStatus', false); 
+            io.emit('hostStatus', false); // Show button again if host leaves
         }
         delete players[socket.id];
         io.emit('updatePlayers', Object.values(players));
