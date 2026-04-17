@@ -58,6 +58,7 @@ io.on('connection', (socket) => {
 
     socket.on('startQuestion', () => {
         if (socket.id !== hostSocketId) return; 
+        if (isAcceptingAnswers) return; // ANTI-DOUBLE CLICK PROTECTION
         
         gameStarted = true; 
         
@@ -66,7 +67,6 @@ io.on('connection', (socket) => {
             questionStartTime = Date.now();
             for(let id in players) players[id].hasAnswered = false;
             
-            // Check if it's the last question for the bonus banner
             let isLast = currentQuestion === (questions.length - 1);
             
             io.emit('newQuestion', { 
@@ -101,7 +101,6 @@ io.on('connection', (socket) => {
             
             let totalPointsEarned = points + bonus;
             
-            // MULTIPLY BY 2 IF IT IS THE LAST QUESTION
             if (currentQuestion === (questions.length - 1)) {
                 totalPointsEarned *= 2;
             }
@@ -114,16 +113,16 @@ io.on('connection', (socket) => {
 
     socket.on('endQuestion', () => {
         if (socket.id !== hostSocketId) return; 
+        if (!isAcceptingAnswers) return; // ANTI-DOUBLE CLICK / MANUAL OVERRIDE PROTECTION
+        
         isAcceptingAnswers = false;
         
-        // Grab the correct answer text before incrementing the index
         let correctOptIndex = questions[currentQuestion].ans;
         let correctText = questions[currentQuestion].options[correctOptIndex];
         
         currentQuestion++;
         let sorted = Object.values(players).sort((a, b) => b.score - a.score);
         
-        // Send both the leaderboard and the correct answer text
         io.emit('leaderboard', { 
             top10: sorted.slice(0, 10), 
             correctAnswer: correctText 
@@ -135,6 +134,7 @@ io.on('connection', (socket) => {
         
         gameStarted = false; 
         currentQuestion = 0;
+        isAcceptingAnswers = false;
         
         for(let id in players) {
             players[id].score = 0;
