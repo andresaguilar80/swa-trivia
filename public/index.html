@@ -22,10 +22,8 @@
 
         #game-layout { position: relative; z-index: 10; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; padding: 20px; box-sizing: border-box; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         
-        /* Game Card - Transition added for transparent effect at the end */
         #game-card { background-color: rgba(17, 27, 77, 0.85); backdrop-filter: blur(5px); padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 3px solid var(--swa-yellow); max-width: 500px; width: 100%; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; transition: all 0.5s ease; margin: auto; }
         
-        /* Utility class to strip the box at the end of the game */
         .transparent-card { background: transparent !important; border: none !important; box-shadow: none !important; backdrop-filter: none !important; }
 
         h1 { color: var(--swa-yellow); text-transform: uppercase; letter-spacing: 2px; margin-top: 0; text-shadow: 2px 2px 0 #000; font-size: 28px; }
@@ -38,6 +36,9 @@
         .btn-b { background-color: var(--swa-yellow); color: black; border-color: black; }
         .btn-c { background-color: var(--swa-red); color: white; border-color: white; }
         .btn-d { background-color: var(--swa-silver); color: black; border-color: black; }
+        
+        /* NEW: Utility for the Skip Timer button */
+        .btn-skip { background-color: var(--swa-red); color: white; border-color: white; padding: 10px 20px; font-size: 16px; margin: 0 5px; }
 
         .hidden { display: none !important; }
         #timer { font-size: 60px; font-weight: bold; color: var(--swa-yellow); margin: 15px; transition: color 0.3s; text-shadow: 4px 4px 0 rgba(0,0,0,0.8); }
@@ -52,11 +53,9 @@
         #leaderboard { font-size: 20px; text-align: left; width: 100%; max-width: 400px; margin: 0 auto; background: rgba(0, 0, 0, 0.6); padding: 20px 30px; border-radius: 20px; border: 4px solid var(--swa-silver); box-sizing: border-box; list-style: none; padding-left: 20px; text-shadow: 2px 2px 0 #000; }
         #leaderboard li { margin-bottom: 15px; border-bottom: 2px dashed rgba(255,255,255,0.3); padding-bottom: 5px; list-style-position: inside; text-transform: uppercase;}
         
-        /* PRE-GAME LOBBY NAMES CLOUD */
         .lobby-names-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 20px; max-height: 250px; overflow-y: auto; padding: 10px;}
         .lobby-name { text-transform: uppercase; animation: fadeIn 0.5s ease-in; text-shadow: 2px 2px 0px #000; }
 
-        /* PODIUM 3D STYLES */
         .podium-container { display: flex; justify-content: center; align-items: flex-end; gap: 5px; margin-top: 20px; height: 220px; width: 100%; max-width: 500px;}
         .podium-place { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; width: 30%; text-shadow: 2px 2px 0 #000; }
         .podium-bar { width: 100%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 28px; color: black; border-radius: 10px 10px 0 0; box-shadow: inset 0 10px 0 rgba(255,255,255,0.3), 4px 0 0 rgba(0,0,0,0.5); text-shadow: none;}
@@ -168,7 +167,7 @@
             .btn { font-size: 16px; padding: 12px 20px; }
             #timer { font-size: 45px; }
             .host-header-controls { flex-direction: column; gap: 15px; text-align: center; }
-            #start-btn { width: 100%; max-width: 100%; }
+            #start-btn, #force-end-btn, #jump-btn { width: 100%; max-width: 100%; margin: 5px 0;}
             .host-grid { grid-template-columns: 1fr; }
             .host-panel { height: 280px; } 
             .terminal-hub { width: 300px; }
@@ -240,9 +239,13 @@
                         <h2 style="color: var(--swa-yellow); text-shadow: 2px 2px 0 #000; margin: 0;">COMMAND CENTER</h2>
                         <h3 id="player-count" style="margin: 5px 0;">PLAYERS: 0</h3>
                     </div>
-                    <button id="start-btn" class="btn btn-c" onclick="startQuestion()">START GAME</button>
-                    <button id="jump-btn" class="btn btn-b hidden" onclick="jumpToNext()">JUMP TO NEXT Q</button>
-                    <div id="timer-host" class="hidden" style="font-size:24px; color: var(--swa-yellow); font-weight: bold;">Q TIME: <span id="time-left-host">20</span>s</div>
+                    
+                    <button id="start-btn" class="btn btn-c" onclick="startQuestion()" style="max-width: 250px;">START GAME</button>
+                    
+                    <button id="force-end-btn" class="btn btn-skip hidden" onclick="forceEndQuestion()">⏭️ SKIP TIMER</button>
+                    <button id="jump-btn" class="btn btn-b hidden" onclick="jumpToNext()" style="max-width: 250px;">⏭️ FORCE NEXT Q</button>
+                    
+                    <div id="timer-host" class="hidden" style="font-size:24px; color: var(--swa-yellow); font-weight: bold; margin-left: 10px;">Q TIME: <span id="time-left-host">20</span>s</div>
                 </div>
 
                 <div class="host-grid">
@@ -308,7 +311,7 @@
         const socket = io();
         let isHost = false;
         let timerInterval;
-        let gameStartedClient = false; // Tracks phase for lobby names
+        let gameStartedClient = false; 
 
         const bgMusic = new Audio('/8bit-loop.mp3');
         bgMusic.loop = true;
@@ -317,7 +320,6 @@
         const epicEndingMusic = new Audio('/punch-out-ending.mp3');
         epicEndingMusic.volume = 0.9; 
 
-        // Random fonts for lobby
         const nameFonts = ['Courier New', 'Arial', 'Impact', 'Comic Sans MS', 'Verdana', 'Georgia', 'Trebuchet MS', 'Lucida Console'];
 
         function generateStars() {
@@ -418,7 +420,6 @@
                     liveRank.appendChild(li);
                 });
             } else if (!gameStartedClient) {
-                // Populate pre-game lobby cloud for players
                 const lobbyContainer = document.getElementById('lobby-names-container');
                 if (lobbyContainer) {
                     lobbyContainer.innerHTML = '';
@@ -427,7 +428,7 @@
                         span.className = 'lobby-name';
                         span.innerText = p.name;
                         span.style.fontFamily = nameFonts[Math.floor(Math.random() * nameFonts.length)];
-                        span.style.fontSize = Math.floor(Math.random() * 14 + 14) + 'px'; // 14 to 28px
+                        span.style.fontSize = Math.floor(Math.random() * 14 + 14) + 'px'; 
                         span.style.color = Math.random() > 0.5 ? 'var(--swa-yellow)' : 'white';
                         lobbyContainer.appendChild(span);
                     });
@@ -438,14 +439,26 @@
         function startQuestion() {
             if (isHost) {
                 if (bgMusic.paused) bgMusic.play().catch(e => console.log("Audio blocked"));
-                const startBtn = document.getElementById('start-btn');
-                const jumpBtn = document.getElementById('jump-btn');
-                if (startBtn) startBtn.classList.add('hidden'); 
-                if (jumpBtn) jumpBtn.classList.add('hidden'); 
+                
+                document.getElementById('start-btn').classList.add('hidden'); 
+                document.getElementById('jump-btn').classList.add('hidden'); 
+                document.getElementById('force-end-btn').classList.remove('hidden'); 
+                
                 socket.emit('startQuestion');
             }
         }
 
+        // NEW: Force End Current Question Early (Manual Override)
+        function forceEndQuestion() {
+            if (isHost) {
+                clearInterval(timerInterval);
+                document.getElementById('time-left-host').innerText = "0";
+                document.getElementById('force-end-btn').classList.add('hidden');
+                socket.emit('endQuestion');
+            }
+        }
+
+        // NEW: Force Start Next Question Early (Skip 10s wait)
         function jumpToNext() {
             if (isHost) {
                 clearInterval(timerInterval); 
@@ -456,7 +469,7 @@
         socket.on('newQuestion', (data) => {
             gameStartedClient = true;
             document.getElementById('leaderboard-screen').classList.add('hidden');
-            document.getElementById('lobby-names-container').innerHTML = ''; // Clear lobby cloud
+            document.getElementById('lobby-names-container').innerHTML = ''; 
             
             const qBox = document.getElementById('question-box');
             qBox.classList.remove('animate-slide');
@@ -467,7 +480,6 @@
                 document.getElementById('game-screen').classList.remove('hidden');
                 document.getElementById('question-box').classList.remove('hidden');
                 
-                // Show bonus banner if it is the last question
                 const bonusBanner = document.getElementById('bonus-banner');
                 if (data.isLast) {
                     bonusBanner.classList.remove('hidden');
@@ -513,7 +525,10 @@
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
                     timerEl.classList.remove('timer-warning');
-                    if(isHost) socket.emit('endQuestion');
+                    if(isHost) {
+                        document.getElementById('force-end-btn').classList.add('hidden');
+                        socket.emit('endQuestion');
+                    }
                 }
             }, 1000);
         }
@@ -522,7 +537,6 @@
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('leaderboard-screen').classList.remove('hidden');
             
-            // SHOW CORRECT ANSWER
             document.getElementById('last-correct-answer').innerText = "✔️ Correct: " + data.correctAnswer;
 
             const list = document.getElementById('leaderboard');
@@ -534,6 +548,7 @@
             });
             
             if(isHost) {
+                document.getElementById('force-end-btn').classList.add('hidden');
                 document.getElementById('jump-btn').classList.remove('hidden');
             }
 
@@ -557,18 +572,19 @@
             document.getElementById('leaderboard-screen').classList.add('hidden');
             document.getElementById('host-screen').classList.add('hidden');
             
-            // STRIP THE BOX FOR THE FINALE
             document.getElementById('game-card').classList.add('transparent-card');
             
-            if(isHost) document.getElementById('jump-btn').classList.add('hidden');
+            if(isHost) {
+                document.getElementById('jump-btn').classList.add('hidden');
+                document.getElementById('force-end-btn').classList.add('hidden');
+            }
+            
             document.getElementById('podium-screen').classList.remove('hidden');
             document.getElementById('fireworks-container').classList.remove('hidden');
 
-            // RENDER 3D VISUAL PODIUM
             const podiumBars = document.getElementById('podium-bars');
             podiumBars.innerHTML = '';
             
-            // Visual order: 2nd Place (Left), 1st Place (Center), 3rd Place (Right)
             const visualOrder = [1, 0, 2]; 
             
             visualOrder.forEach(idx => {
@@ -583,7 +599,6 @@
                     nameDiv.style.color = idx === 0 ? 'var(--swa-yellow)' : 'white';
                     if (idx === 0) nameDiv.style.animation = 'championFlash 1s infinite';
                     
-                    // Added planes instead of cups
                     let emoji = idx === 0 ? '✈️' : '🛫';
                     nameDiv.innerText = `${emoji}\n${p.name}`;
 
@@ -608,7 +623,6 @@
             
             const restartContainer = document.getElementById('restart-container');
             if (isHost) {
-                // Remove transparent card class if restarting
                 restartContainer.innerHTML = '<button class="btn btn-c" onclick="restartGame()" style="max-width: 250px;">RESTART GAME</button>';
             } else {
                 restartContainer.innerHTML = '<p style="color: var(--swa-yellow); font-weight: bold; text-shadow: 2px 2px 0 #000;">WAITING FOR HOST TO RESTART...</p>';
