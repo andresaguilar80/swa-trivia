@@ -8,15 +8,9 @@ const io = new Server(server);
 
 app.use(express.static('public'));
 
-let players = {};
-let currentQuestion = 0;
-let isAcceptingAnswers = false;
-let questionStartTime = 0;
-
-let gameStarted = false;
-let hostSocketId = null;
-
-const questions = [
+// --- CONFIGURATION ---
+const ADMIN_ID = "andresaguilar80";
+const QUESTIONS = [
     { q: "When did Southwest Airlines commence its first flights?", options: ["1967", "1971", "1980", "1995"], ans: 1 },
     { q: "What is the stock ticker symbol for Southwest Airlines?", options: ["SWA", "LUV", "SWAIR", "FLY"], ans: 1 },
     { q: "Which airport is the main operating base and headquarters for Southwest Airlines?", options: ["Dallas/Fort Worth (DFW)", "Houston George Bush (IAH)", "Dallas Love Field (DAL)", "Austin-Bergstrom (AUS)"], ans: 2 },
@@ -27,133 +21,144 @@ const questions = [
     { q: "What is the name of Southwest Airlines' frequent flyer program?", options: ["AAdvantage", "SkyMiles", "TrueBlue", "Rapid Rewards"], ans: 3 }
 ];
 
-io.on('connection', (socket) => {
-    
-    socket.emit('hostStatus', !!hostSocketId);
+// --- STATE MACHINE & GAME LOGIC ---
+class TriviaGame {
+    constructor() {
+        this.state = 'LOBBY'; // States: LOBBY, QUESTION, LEADERBOARD, PODIUM
+        this.players = new Map(); // Key: UUID (Not socket ID) -> Value: Player Object
+        this.currentQuestionIndex = 0;
+        this.hostSocketId = null;
+        this.questionStartTime = 0;
+    }
 
-    socket.on('claimHost', (adminName) => {
-        if (adminName !== "andresaguilar80") {
-            socket.emit('hostClaimed', { success: false, message: "INVALID CREDENTIALS." });
-            return;
+    addOrUpdatePlayer(uuid, name, socketId) {
+        if (!this.players.has(uuid)) {
+            if (this.state !== 'LOBBY') return false; // Prevent late joins
+            this.players.set(uuid, { name, score: 0, hasAnswered: false, socketId });
+        } else {
+            // Update socket ID on reconnect
+            let p = this.players.get(uuid);
+            p.socketId = socketId;
         }
+        return true;
+    }
 
-        if (!hostSocketId) {
-            hostSocketId = socket.id;
-            socket.emit('hostClaimed', { success: true, questions: questions });
+    calculateScore(timeTakenSeconds, isLastQuestion) {
+        let points = 100;
+        let bonus = timeTakenSeconds < 1 ? 600 : Math.max(20, 600 - (Math.floor(timeTakenSeconds) * 20));
+        let total = points + bonus;
+        return isLastQuestion ? total * 2 : total;
+    }
+
+    getTopPlayers(limit = 10) {
+        return Array.from(this.players.values())
+            .sort((a, b) => b.score - a.score)
+            .map(p => ({ name: p.name, score: p.score, hasAnswered: p.hasAnswered }))
+            .slice(0, limit);
+    }
+
+    reset() {
+        this.state = 'LOBBY';
+        this.currentQuestionIndex = 0;
+        for (let [_, player] of this.players) {
+            player.score = 0;
+            player.hasAnswered = false;
+        }
+    }
+}
+
+const game = new TriviaGame();
+
+// --- SOCKET HANDLERS ---
+io.on('connection', (socket) => {
+    socket.emit('hostStatus', !!game.hostSocketId);
+
+    // Host Authentication
+    socket.on('claimHost', (adminName) => {
+        if (adminName !== ADMIN_ID) {
+            return socket.emit('hostClaimed', { success: false, message: "INVALID CREDENTIALS." });
+        }
+        if (!game.hostSocketId) {
+            game.hostSocketId = socket.id;
+            socket.emit('hostClaimed', { success: true, questions: QUESTIONS });
             io.emit('hostStatus', true); 
         } else {
-            socket.emit('hostClaimed', { success: false, message: "Another user is already hosting this game!" });
+            socket.emit('hostClaimed', { success: false, message: "Host is already active." });
         }
     });
 
-    socket.on('join', (name) => {
-        if (gameStarted) {
-            socket.emit('joinError', 'The flight has already departed! You cannot join a game in progress.');
-            return;
+    // Player Join with Persistence
+    socket.on('join', ({ name, uuid }) => {
+        const joined = game.addOrUpdatePlayer(uuid, name, socket.id);
+        if (!joined) {
+            return socket.emit('joinError', 'The flight has already departed!');
         }
-        players[socket.id] = { name: name, score: 0, hasAnswered: false };
-        io.emit('updatePlayers', Object.values(players));
+        io.emit('updatePlayers', game.getTopPlayers(100)); // Broadcast to lobby
         socket.emit('joinSuccess');
     });
 
+    // Host Actions
     socket.on('startQuestion', () => {
-        if (socket.id !== hostSocketId) return; 
-        if (isAcceptingAnswers) return; // ANTI-DOUBLE CLICK PROTECTION
+        if (socket.id !== game.hostSocketId || game.state === 'QUESTION') return;
         
-        gameStarted = true; 
+        game.state = 'QUESTION';
+        game.questionStartTime = Date.now();
         
-        if(currentQuestion < questions.length) {
-            isAcceptingAnswers = true;
-            questionStartTime = Date.now();
-            for(let id in players) players[id].hasAnswered = false;
-            
-            let isLast = currentQuestion === (questions.length - 1);
-            
-            io.emit('newQuestion', { 
-                qIndex: currentQuestion, 
-                question: questions[currentQuestion],
-                isLast: isLast
-            });
-            io.emit('updatePlayers', Object.values(players)); 
-        } else {
-            let sorted = Object.values(players).sort((a, b) => b.score - a.score);
-            io.emit('gameOver', sorted.slice(0, 3)); 
-        }
+        for (let [_, p] of game.players) p.hasAnswered = false;
+
+        const isLast = game.currentQuestionIndex === (QUESTIONS.length - 1);
+        io.emit('newQuestion', { qIndex: game.currentQuestionIndex, question: QUESTIONS[game.currentQuestionIndex], isLast });
+        io.emit('updatePlayers', game.getTopPlayers(100)); 
     });
 
-    socket.on('answer', (ansIndex) => {
-        let player = players[socket.id];
-        if(!player || player.hasAnswered || !isAcceptingAnswers) return;
+    // Player Answers
+    socket.on('answer', ({ uuid, ansIndex }) => {
+        if (game.state !== 'QUESTION') return;
         
+        const player = game.players.get(uuid);
+        if (!player || player.hasAnswered) return;
+
         player.hasAnswered = true;
-        let timeTaken = (Date.now() - questionStartTime) / 1000; 
-        
-        if (ansIndex === questions[currentQuestion].ans) {
-            let points = 100; 
-            let bonus = 0;
-            if (timeTaken < 1) {
-                bonus = 600;
-            } else {
-                bonus = 600 - (Math.floor(timeTaken) * 20);
-                if (timeTaken >= 20) bonus = 20; 
-                if (bonus < 20) bonus = 20;
-            }
-            
-            let totalPointsEarned = points + bonus;
-            
-            if (currentQuestion === (questions.length - 1)) {
-                totalPointsEarned *= 2;
-            }
-            
-            player.score += totalPointsEarned;
+        const timeTaken = (Date.now() - game.questionStartTime) / 1000;
+
+        if (ansIndex === QUESTIONS[game.currentQuestionIndex].ans) {
+            player.score += game.calculateScore(timeTaken, game.currentQuestionIndex === (QUESTIONS.length - 1));
         }
         
-        io.emit('updatePlayers', Object.values(players));
+        io.emit('updatePlayers', game.getTopPlayers(100));
     });
 
+    // Resolve Question
     socket.on('endQuestion', () => {
-        if (socket.id !== hostSocketId) return; 
-        if (!isAcceptingAnswers) return; // ANTI-DOUBLE CLICK / MANUAL OVERRIDE PROTECTION
+        if (socket.id !== game.hostSocketId) return;
         
-        isAcceptingAnswers = false;
-        
-        let correctOptIndex = questions[currentQuestion].ans;
-        let correctText = questions[currentQuestion].options[correctOptIndex];
-        
-        currentQuestion++;
-        let sorted = Object.values(players).sort((a, b) => b.score - a.score);
-        
-        io.emit('leaderboard', { 
-            top10: sorted.slice(0, 10), 
-            correctAnswer: correctText 
-        }); 
+        const correctText = QUESTIONS[game.currentQuestionIndex].options[QUESTIONS[game.currentQuestionIndex].ans];
+        game.currentQuestionIndex++;
+
+        if (game.currentQuestionIndex < QUESTIONS.length) {
+            game.state = 'LEADERBOARD';
+            io.emit('leaderboard', { top10: game.getTopPlayers(10), correctAnswer: correctText });
+        } else {
+            game.state = 'PODIUM';
+            io.emit('gameOver', game.getTopPlayers(3));
+        }
     });
 
     socket.on('restartGame', () => {
-        if (socket.id !== hostSocketId) return; 
-        
-        gameStarted = false; 
-        currentQuestion = 0;
-        isAcceptingAnswers = false;
-        
-        for(let id in players) {
-            players[id].score = 0;
-            players[id].hasAnswered = false;
-        }
-        
-        io.emit('gameReset'); 
-        io.emit('updatePlayers', Object.values(players));
+        if (socket.id !== game.hostSocketId) return;
+        game.reset();
+        io.emit('gameReset');
+        io.emit('updatePlayers', game.getTopPlayers(100));
     });
 
     socket.on('disconnect', () => {
-        if (socket.id === hostSocketId) {
-            hostSocketId = null; 
-            io.emit('hostStatus', false); 
+        if (socket.id === game.hostSocketId) {
+            game.hostSocketId = null;
+            io.emit('hostStatus', false);
         }
-        delete players[socket.id];
-        io.emit('updatePlayers', Object.values(players));
+        // Players remain in `game.players` in case they reconnect
     });
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => console.log(`🚀 Production Server running on port ${PORT}`));
