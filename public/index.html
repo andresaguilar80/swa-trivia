@@ -642,11 +642,25 @@
                     this.audio.epic.play().catch(e => console.log("Audio blocked"));
                     
                     const restartContainer = document.getElementById('restart-container');
+                    restartContainer.innerHTML = '';
+                    
                     if (this.isHost) {
-                        restartContainer.innerHTML = '<button class="btn btn-c" id="btn-restart" style="max-width: 250px;">RESTART GAME</button>';
-                        document.getElementById('btn-restart').onclick = () => this.socket.emit('restartGame');
+                        const restartBtn = document.createElement('button');
+                        restartBtn.className = 'btn btn-c';
+                        restartBtn.innerText = 'RESTART GAME';
+                        restartBtn.style.maxWidth = '250px';
+                        restartBtn.onclick = () => {
+                            this.socket.emit('restartGame');
+                        };
+                        restartContainer.appendChild(restartBtn);
                     } else {
-                        restartContainer.innerHTML = '<p style="color: var(--swa-yellow); font-weight: bold; text-shadow: 2px 2px 0 #000; text-align: center;">WAITING FOR HOST TO RESTART...</p>';
+                        const p = document.createElement('p');
+                        p.style.color = 'var(--swa-yellow)';
+                        p.style.fontWeight = 'bold';
+                        p.style.textShadow = '2px 2px 0 #000';
+                        p.style.textAlign = 'center';
+                        p.innerText = 'WAITING FOR HOST TO RESTART...';
+                        restartContainer.appendChild(p);
                     }
                 });
 
@@ -663,8 +677,12 @@
                     if (this.isHost) {
                         document.getElementById('host-screen').classList.remove('hidden');
                         document.getElementById('start-btn').classList.remove('hidden'); 
+                        document.getElementById('jump-btn').classList.add('hidden'); 
+                        document.getElementById('force-end-btn').classList.add('hidden'); 
+                        document.getElementById('timer-host').classList.add('hidden'); 
                     } else {
                         document.getElementById('game-screen').classList.remove('hidden');
+                        document.getElementById('question-box').classList.remove('hidden');
                         document.getElementById('question-text').innerText = "WAITING FOR HOST TO START...";
                         document.getElementById('options').classList.add('hidden');
                         document.getElementById('wait-msg').classList.add('hidden');
