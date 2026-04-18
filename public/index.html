@@ -135,32 +135,64 @@
         .terminal-hub { position: absolute; bottom: 29%; left: 10%; width: 450px; height: 60px; background: linear-gradient(to bottom, #666, #444); border-top: 3px solid #999; border-bottom: 5px solid #222; box-shadow: 10px 10px 0 rgba(0,0,0,0.6); z-index: 1;}
         .hub-windows { position: absolute; top: 15px; left: 15px; width: 12px; height: 12px; background: #ffff99; box-shadow: 25px 0 #ffff99, 50px 0 #ffff99, 120px 0 #ffff99, 145px 0 #ffff99, 240px 0 #ffff99, 265px 0 #ffff99, 360px 0 #ffff99, 385px 0 #ffff99; animation: lightsOn 5s infinite; }
 
+        /* =========================================
+           16-BIT PLANES SCALED 2X WITH WINGS
+           ========================================= */
         .plane { position: absolute; z-index: 20; image-rendering: pixelated;}
-        .plane::before { content: ''; position: absolute; background: linear-gradient(to bottom, var(--swa-blue-light) 0%, var(--swa-blue) 50%, var(--swa-blue-dark) 100%); } 
-        .plane::after { content: ''; position: absolute; box-shadow: inset -2px -2px 5px rgba(0,0,0,0.5); } 
+        .plane::before { 
+            content: ''; position: absolute; 
+            background: linear-gradient(to bottom, var(--swa-blue-light) 0%, var(--swa-blue) 50%, var(--swa-blue-dark) 100%); 
+        } 
+        .plane::after { 
+            content: ''; position: absolute; 
+            box-shadow: inset -4px -4px 10px rgba(0,0,0,0.5); 
+        } 
         .swa-livery-tail { background: linear-gradient(to bottom, var(--swa-red) 33%, var(--swa-yellow) 33% 66%, var(--swa-blue) 66%); }
-        .plane-windows { position: absolute; background: repeating-linear-gradient(90deg, #ffffaa, #ffffaa 2px, transparent 2px, transparent 5px); z-index: 21; opacity: 0.9;}
-        .anti-collision-light { position: absolute; top: 0px; left: 40%; width: 4px; height: 4px; background: #ff3333; box-shadow: 0 0 8px #ff3333, 0 0 15px #ff0000; animation: aviationStrobe 1.5s infinite; z-index: 22; border-radius: 50%;}
-        @keyframes aviationStrobe { 0%, 10%, 20%, 100% { opacity: 0; } 5%, 15% { opacity: 1; transform: scale(1.5); } }
         
-        .exhaust { position: absolute; right: -12px; top: 10px; width: 15px; height: 6px; background: #fff; box-shadow: -3px 0 0 #ffff66, -8px 0 0 #ff6600, -12px 0 5px rgba(255, 0, 0, 0.5); border-radius: 50%; animation: thrustFlicker 0.05s infinite alternate; z-index: 19; }
+        /* Wings & Engines */
+        .wing-back { position: absolute; background: #555; z-index: -1; }
+        .wing-front { position: absolute; background: linear-gradient(to bottom, var(--swa-silver), #777); z-index: 3; border-bottom: 2px solid #222; }
+        .engine { position: absolute; background: linear-gradient(to bottom, #888, #333); border-radius: 10px; box-shadow: inset 0 -2px 5px #111; }
+
+        .plane-windows { position: absolute; z-index: 2; opacity: 0.9;}
+        .anti-collision-light { position: absolute; background: #ff3333; box-shadow: 0 0 12px #ff3333, 0 0 20px #ff0000; animation: aviationStrobe 1.5s infinite; z-index: 4; border-radius: 50%;}
+        .exhaust { position: absolute; background: #fff; box-shadow: -5px 0 0 #ffff66, -12px 0 0 #ff6600, -20px 0 10px rgba(255, 0, 0, 0.5); border-radius: 50%; animation: thrustFlicker 0.05s infinite alternate; z-index: 0; }
+        
+        /* 2X MD PLANE */
+        .plane-md { width: 160px; height: 40px; }
+        .plane-md::before { left: 0; top: 10px; width: 130px; height: 24px; border-radius: 40px 10px 10px 40px; box-shadow: 6px -6px rgba(0,0,0,0.3); }
+        .plane-md::after { right: 0; top: -4px; width: 30px; height: 44px; border-radius: 10px 10px 0 0;}
+        .plane-md .plane-windows { top: 18px; left: 30px; width: 80px; height: 4px; background: repeating-linear-gradient(90deg, #ffffaa, #ffffaa 4px, transparent 4px, transparent 10px); }
+        .plane-md .anti-collision-light { top: 8px; left: 40%; width: 8px; height: 8px; }
+        .plane-md .exhaust { right: -20px; top: 20px; width: 26px; height: 10px; }
+        .plane-md .wing-front { width: 36px; height: 24px; top: 26px; left: 60px; transform: skewX(-45deg); border-radius: 0 0 5px 15px; }
+        .plane-md .wing-back { width: 30px; height: 18px; top: -2px; left: 75px; transform: skewX(45deg); border-radius: 15px 5px 0 0; }
+        .plane-md .engine { width: 16px; height: 10px; top: 10px; left: -6px; transform: skewX(45deg); }
+
+        /* 2X LG PLANE */
+        .plane-lg { width: 260px; height: 60px; }
+        .plane-lg::before { left: 0; top: 16px; width: 210px; height: 32px; border-radius: 60px 10px 10px 60px; box-shadow: 10px -10px rgba(0,0,0,0.4); }
+        .plane-lg::after { right: 0; top: -10px; width: 50px; height: 70px; border-radius: 16px 16px 0 0;}
+        .plane-lg .plane-windows { top: 28px; left: 50px; width: 130px; height: 6px; background: repeating-linear-gradient(90deg, #ffffaa, #ffffaa 6px, transparent 6px, transparent 14px); }
+        .plane-lg .anti-collision-light { top: 12px; left: 40%; width: 10px; height: 10px; }
+        .plane-lg .exhaust { right: -30px; top: 32px; width: 40px; height: 14px; }
+        .plane-lg .wing-front { width: 60px; height: 36px; top: 40px; left: 100px; transform: skewX(-45deg); border-radius: 0 0 10px 25px; border-bottom: 3px solid #222; }
+        .plane-lg .wing-back { width: 50px; height: 26px; top: -5px; left: 125px; transform: skewX(45deg); border-radius: 25px 10px 0 0; }
+        .plane-lg .engine { width: 26px; height: 14px; top: 16px; left: -10px; transform: skewX(45deg); }
+
         @keyframes thrustFlicker { 0% { transform: scaleX(1) translateY(-1px); opacity: 0.8;} 100% { transform: scaleX(1.3) translateY(1px); opacity: 1;} }
-        
-        .plane-md { width: 80px; height: 20px; }
-        .plane-md::before { left: 0; top: 5px; width: 65px; height: 12px; border-radius: 20px 5px 5px 20px; box-shadow: 3px -3px rgba(0,0,0,0.3); }
-        .plane-md::after { right: 0; top: -2px; width: 15px; height: 22px; border-radius: 5px 5px 0 0;}
-        .plane-md .plane-windows { top: 9px; left: 15px; width: 40px; height: 2px; }
-
-        .plane-lg { width: 130px; height: 30px; }
-        .plane-lg::before { left: 0; top: 8px; width: 105px; height: 16px; border-radius: 30px 5px 5px 30px; box-shadow: 5px -5px rgba(0,0,0,0.4); }
-        .plane-lg::after { right: 0; top: -5px; width: 25px; height: 35px; border-radius: 8px 8px 0 0;}
-        .plane-lg .plane-windows { top: 14px; left: 25px; width: 65px; height: 3px; }
-
         @keyframes groundTakeoff { 0% { transform: translate(0, 0) rotate(0deg); bottom: 29%; left: -100px; opacity: 0; } 5% { opacity: 1; } 10% { transform: translate(10vw, 0) rotate(0deg); bottom: 29%; } 30% { transform: translate(40vw, 0) rotate(0deg); bottom: 29%; } 50% { transform: translate(60vw, 1vh) rotate(-8deg); bottom: 31%; } 80% { transform: translate(90vw, 20vh) rotate(-15deg); bottom: 50%; } 100% { transform: translate(130vw, 40vh) rotate(-15deg); bottom: 70%; opacity: 0; } }
         @keyframes groundLanding { 0% { transform: translate(0, 0) scaleX(-1) rotate(10deg); top: 5%; right: -100px; opacity: 0; } 5% { opacity: 1; } 40% { transform: translate(-40vw, 15vh) scaleX(-1) rotate(6deg); top: 25%; } 65% { transform: translate(-75vw, 66vh) scaleX(-1) rotate(2deg); top: 66%; } 70% { transform: translate(-80vw, 66.5vh) scaleX(-1) rotate(0deg); top: 66.5%; } 95% { transform: translate(-110vw, 66.5vh) scaleX(-1) rotate(0deg); top: 66.5%; opacity: 1; } 100% { transform: translate(-130vw, 66.5vh) scaleX(-1) rotate(0deg); top: 66.5%; opacity: 0; } }
         
         .ground-takeoff { animation: groundTakeoff linear infinite; z-index: 20; }
         .ground-landing { animation: groundLanding linear infinite; z-index: 20; }
+
+        /* PARKED & TAXI PLANES */
+        .parked-planes-container { position: absolute; bottom: 27%; left: 5%; width: 1000px; display: flex; gap: 60px; z-index: 2; transform: scale(0.65); transform-origin: bottom left; }
+        .gate-slot { position: relative; }
+        .jet-bridge { position: absolute; background: linear-gradient(to bottom, #888, #555); width: 30px; height: 10px; top: 15px; left: 100px; box-shadow: 2px 2px 0 #000; z-index: 21; }
+
+        .taxiway-planes { position: absolute; width: 100%; height: 100%; top:0; left:0; pointer-events: none; z-index: 5; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); filter: brightness(1.2); } 100% { transform: scale(1); } }
@@ -179,6 +211,7 @@
             .host-header-controls { flex-direction: column; gap: 15px; }
             #start-btn, #force-end-btn, #jump-btn { width: 100%; max-width: 100%; margin: 5px auto;}
             .host-grid { grid-template-columns: 1fr; }
+            .parked-planes-container { transform: scale(0.4); }
         }
     </style>
 </head>
@@ -191,18 +224,56 @@
     <div class="bg-layer-city"></div>
     <div class="bg-layer-ground"></div>
     
+    <div class="parked-planes-container">
+        <div class="gate-slot">
+            <div class="jet-bridge"></div>
+            <div class="plane plane-md swa-livery-tail" style="position:relative; transform: scaleX(-1);">
+                <div class="wing-back"></div><div class="plane-windows"></div><div class="wing-front"><div class="engine"></div></div>
+            </div>
+        </div>
+        <div class="gate-slot">
+            <div class="jet-bridge"></div>
+            <div class="plane plane-md swa-livery-tail" style="position:relative; transform: scaleX(-1);">
+                <div class="wing-back"></div><div class="plane-windows"></div><div class="wing-front"><div class="engine"></div></div>
+            </div>
+        </div>
+        <div class="gate-slot">
+            <div class="jet-bridge"></div>
+            <div class="plane plane-lg swa-livery-tail" style="position:relative; transform: scaleX(-1);">
+                <div class="wing-back"></div><div class="plane-windows"></div><div class="wing-front"><div class="engine"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="taxiway-planes">
+        <div class="plane plane-md swa-livery-tail" style="bottom: 12%; right: 10%; transform: scaleX(-1) scale(0.8);">
+            <div class="wing-back"></div><div class="plane-windows"></div><div class="wing-front"><div class="engine"></div></div>
+            <div class="anti-collision-light"></div>
+        </div>
+        <div class="plane plane-lg swa-livery-tail" style="bottom: 5%; left: 15%; transform: scale(0.9);">
+            <div class="wing-back"></div><div class="plane-windows"></div><div class="wing-front"><div class="engine"></div></div>
+            <div class="anti-collision-light"></div>
+        </div>
+    </div>
+
     <div class="plane plane-lg swa-livery-tail ground-takeoff" style="animation-duration: 18s;">
+        <div class="wing-back"></div>
         <div class="plane-windows"></div>
+        <div class="wing-front"><div class="engine"></div></div>
         <div class="anti-collision-light"></div>
         <div class="exhaust"></div>
     </div>
     <div class="plane plane-md swa-livery-tail ground-takeoff" style="animation-duration: 22s; animation-delay: 10s;">
+        <div class="wing-back"></div>
         <div class="plane-windows"></div>
+        <div class="wing-front"><div class="engine"></div></div>
         <div class="anti-collision-light"></div>
         <div class="exhaust"></div>
     </div>
     <div class="plane plane-lg swa-livery-tail ground-landing" style="animation-duration: 25s; animation-delay: 5s;">
+        <div class="wing-back"></div>
         <div class="plane-windows"></div>
+        <div class="wing-front"><div class="engine"></div></div>
         <div class="anti-collision-light"></div>
     </div>
     
@@ -288,7 +359,12 @@
             </div>
 
             <div id="podium-screen" class="hidden animate-slide flex-center-col">
-                <h2 style="color: var(--swa-yellow); font-size: 24px; margin-bottom: 10px; text-shadow: 3px 3px 0 #000; text-align: center;">You graduated as a PI Pilot<br>Congratulations</h2>
+                <div id="winner-header" style="text-align: center; margin-bottom: 20px; line-height: 1.2;">
+                    <div id="winner-name-display" style="color: white; font-size: 32px; font-weight: bold; text-shadow: 3px 3px 0 #000; text-transform: uppercase; word-wrap: break-word; max-width: 400px; margin: 0 auto;"></div>
+                    <div style="color: var(--swa-yellow); font-size: 46px; font-weight: bold; text-shadow: 4px 4px 0 #000; text-transform: uppercase; margin: 10px 0; animation: pulse 1s infinite;">CONGRATULATIONS</div>
+                    <div style="color: var(--swa-silver); font-size: 20px; font-weight: bold; text-shadow: 2px 2px 0 #000;">You graduated as a PI Pilot</div>
+                </div>
+
                 <div class="podium-container" id="podium-bars"></div>
                 <br>
                 <div id="restart-container" class="flex-center-col"></div>
@@ -511,7 +587,6 @@
                     list.innerHTML = '';
                     data.top10.forEach((p, index) => {
                         let li = document.createElement('li');
-                        
                         let answerText = p.lastAnswer ? p.lastAnswer : "NO ANSWER";
                         let color = (p.lastAnswer === data.correctAnswer) ? "#66ff66" : "#ff3333";
                         
@@ -522,7 +597,6 @@
                             </div>
                             <span>${p.score} PTS</span>
                         `;
-                        
                         list.appendChild(li);
                     });
                     
@@ -549,6 +623,10 @@
                     
                     document.getElementById('podium-screen').classList.remove('hidden');
                     document.getElementById('fireworks-container').classList.remove('hidden');
+
+                    if (podium && podium.length > 0) {
+                        document.getElementById('winner-name-display').innerText = podium[0].name;
+                    }
 
                     const podiumBars = document.getElementById('podium-bars');
                     podiumBars.innerHTML = '';
