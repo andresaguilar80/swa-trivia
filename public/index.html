@@ -7,8 +7,8 @@
     <style>
         :root {
             --swa-blue: #0b1d5c; 
-            --swa-blue-light: #1d358c; /* 16-bit Highlight */
-            --swa-blue-dark: #050d2e;  /* 16-bit Shadow */
+            --swa-blue-light: #1d358c; 
+            --swa-blue-dark: #050d2e;  
             --swa-red: #E8112d;  
             --swa-yellow: #F7D116; 
             --swa-silver: #A7A9AC; 
@@ -35,7 +35,7 @@
         }
         @keyframes flicker { 0% { opacity: 0.9; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* BACKGROUND LAYERS (Using your generated 16-bit PNGs) */
+        /* BACKGROUND LAYERS */
         .bg-layer-sky { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--retro-sky); z-index: 0; }
         .bg-layer-city { position: absolute; bottom: 30%; left: 0; width: 200%; height: 40%; background-image: url('/assets/city-skyline.png'); background-size: contain; background-repeat: repeat-x; opacity: 0.8; z-index: 1; animation: panLeft 60s linear infinite; image-rendering: pixelated; }
         .bg-layer-ground { position: absolute; bottom: 0; left: 0; width: 100%; height: 35%; background-color: var(--ground-gray); background-image: url('/assets/runway-tarmac.png'); background-size: cover; border-top: 4px solid white; z-index: 2; image-rendering: pixelated;}
@@ -107,59 +107,78 @@
         .podium-name { margin-bottom: 5px; font-weight: bold; text-align: center; word-wrap: break-word; width: 100%; line-height: 1; }
         .podium-score { margin-bottom: 5px; font-size: 14px; color: #fff; }
 
-        .firework { position: absolute; width: 6px; height: 6px; border-radius: 50%; animation: explode 1.5s infinite ease-out; z-index: 5; opacity: 0; }
-        .fw-1 { top: 15%; left: 20%; animation-delay: 0s; } .fw-2 { top: 25%; left: 40%; animation-delay: 0.3s; } .fw-3 { top: 10%; left: 60%; animation-delay: 0.6s; }
-        @keyframes explode { 0% { box-shadow: 0 0 0 0 var(--swa-yellow); opacity: 1; transform: scale(1); } 50% { box-shadow: -40px -40px 0 0 var(--swa-red), 40px -40px 0 0 var(--swa-red), -40px 40px 0 0 var(--swa-light-blue), 40px 40px 0 0 var(--swa-light-blue), 0 -60px 0 0 var(--swa-yellow), 0 60px 0 0 var(--swa-yellow), -60px 0 0 0 white, 60px 0 0 0 white; opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+        /* 10 FIREWORKS WITH SWA COLORS */
+        .firework { position: absolute; width: 6px; height: 6px; border-radius: 50%; animation: explode 2.5s infinite ease-out; z-index: 5; opacity: 0; }
+        .fw-1 { top: 15%; left: 15%; animation-delay: 0.0s; } .fw-2 { top: 25%; left: 35%; animation-delay: 0.4s; } 
+        .fw-3 { top: 10%; left: 55%; animation-delay: 0.8s; } .fw-4 { top: 30%; left: 75%; animation-delay: 1.2s; }
+        .fw-5 { top: 20%; left: 85%; animation-delay: 0.2s; } .fw-6 { top: 12%; left: 25%; animation-delay: 0.6s; }
+        .fw-7 { top: 35%; left: 45%; animation-delay: 1.0s; } .fw-8 { top: 18%; left: 65%; animation-delay: 1.4s; }
+        .fw-9 { top: 28%; left: 10%; animation-delay: 0.5s; } .fw-10 { top: 8%; left: 80%; animation-delay: 0.9s; }
 
-        /* =========================================
-           16-BIT CSS ART UPGRADES 
-           ========================================= */
+        @keyframes explode { 
+            0% { box-shadow: 0 0 0 0 var(--swa-yellow); opacity: 1; transform: scale(1); } 
+            50% { box-shadow: -40px -40px 0 0 var(--swa-red), 40px -40px 0 0 var(--swa-blue-light), -40px 40px 0 0 var(--swa-yellow), 40px 40px 0 0 var(--swa-red), 0 -60px 0 0 var(--swa-yellow), 0 60px 0 0 var(--swa-blue-light), -60px 0 0 0 var(--swa-red), 60px 0 0 0 var(--swa-yellow); opacity: 1; } 
+            100% { transform: scale(1.5); opacity: 0; } 
+        }
 
-        /* 16-BIT CLOUDS: Fluffy with drop shadows */
+        /* 16-BIT CSS ART UPGRADES */
+        
+        /* 16-BIT GIANT CLOUDS */
         .cloud { position: absolute; opacity: 0.85; animation: moveClouds linear infinite; z-index: 1;}
         .cloud-shape { 
             width: 24px; height: 24px; background: #fff; border-radius: 50%;
             box-shadow: 
                 -15px 5px 0 5px #fff, 15px 5px 0 5px #fff, 0 -10px 0 10px #fff,
-                -25px 15px 0 0 #ddd, 25px 15px 0 0 #ddd, 0 15px 0 5px #ddd; /* 16-bit bottom shading */
+                -25px 15px 0 0 #ddd, 25px 15px 0 0 #ddd, 0 15px 0 5px #ddd;
         }
         @keyframes moveClouds { from { transform: translateX(110vw); } to { transform: translateX(-60vw); } }
 
-        /* 16-BIT TOWER: Metallic Gradients and Bevels */
+        /* 16-BIT FAST UFO */
+        .ufo { position: absolute; top: 15%; left: -100px; width: 60px; height: 25px; z-index: 3; animation: ufoFastZip 12s linear infinite; animation-delay: 5s; opacity: 0; }
+        .ufo-body { position: absolute; width: 60px; height: 16px; background: linear-gradient(to bottom, #ccc, #555); border-radius: 50px; top: 5px; box-shadow: inset 0 -3px 5px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.5); }
+        .ufo-dome { position: absolute; width: 24px; height: 12px; background: radial-gradient(circle at 50% 20%, #aaffaa, #00ff00); border-radius: 50px 50px 0 0; top: -5px; left: 18px; opacity: 0.9; box-shadow: 0 0 15px #00ff00; }
+        .ufo-lights { position: absolute; bottom: 2px; left: 10px; width: 6px; height: 6px; background: #ff3333; border-radius: 50%; box-shadow: 15px 0 #ffff33, 30px 0 #33ccff, 40px 0 #ff3333; animation: blinkUfo 0.15s infinite; }
+        
+        @keyframes blinkUfo { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+        @keyframes ufoFastZip { 
+            0% { transform: translateX(-10vw) translateY(0) rotate(10deg); opacity: 0; }
+            1% { opacity: 1; }
+            10% { transform: translateX(40vw) translateY(-15vh) rotate(-15deg); }
+            15% { transform: translateX(50vw) translateY(10vh) rotate(20deg); }
+            25% { transform: translateX(120vw) translateY(-10vh) rotate(-5deg); opacity: 1; }
+            26% { opacity: 0; transform: translateX(120vw); }
+            100% { opacity: 0; transform: translateX(120vw); }
+        }
+
         .control-tower { position: absolute; bottom: 29%; left: 5%; width: 36px; height: 100px; background: linear-gradient(to right, #666, #333); border-left: 2px solid #999; border-right: 4px solid #111; z-index: 1;}
         .tower-cab { position: absolute; top: 0; left: -8px; width: 52px; height: 30px; background: linear-gradient(to bottom, #777, #444); border-top: 2px solid #aaa; border-bottom: 4px solid #111; border-radius: 4px; }
         .tower-windows { position: absolute; top: 6px; left: 6px; width: 8px; height: 12px; background: #ffff99; box-shadow: 12px 0 #ffff99, 24px 0 #ffff99, inset 0 0 5px #ffaa00; }
         .radar-dish { position: absolute; top: -16px; left: 10px; width: 20px; height: 8px; border-bottom: 6px solid #aaa; border-radius: 0 0 15px 15px; animation: radarSpin 2s linear infinite; }
         @keyframes radarSpin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
 
-        /* 16-BIT TERMINAL */
         .terminal-hub { position: absolute; bottom: 29%; left: 10%; width: 450px; height: 60px; background: linear-gradient(to bottom, #666, #444); border-top: 3px solid #999; border-bottom: 5px solid #222; box-shadow: 10px 10px 0 rgba(0,0,0,0.6); z-index: 1;}
         .hub-windows { position: absolute; top: 15px; left: 15px; width: 12px; height: 12px; background: #ffff99; box-shadow: 25px 0 #ffff99, 50px 0 #ffff99, 120px 0 #ffff99, 145px 0 #ffff99, 240px 0 #ffff99, 265px 0 #ffff99, 360px 0 #ffff99, 385px 0 #ffff99; animation: lightsOn 5s infinite; }
 
-        /* 16-BIT PLANES: 3D Cylindrical Fuselage & Passenger Windows */
+        /* 16-BIT PLANES */
         .plane { position: absolute; z-index: 20; image-rendering: pixelated;}
         .plane::before { 
             content: ''; position: absolute; 
-            /* 3D Fuselage Gradient */
             background: linear-gradient(to bottom, var(--swa-blue-light) 0%, var(--swa-blue) 50%, var(--swa-blue-dark) 100%); 
         } 
         .plane::after { 
             content: ''; position: absolute; 
-            box-shadow: inset -2px -2px 5px rgba(0,0,0,0.5); /* 3D Tail Shadow */
+            box-shadow: inset -2px -2px 5px rgba(0,0,0,0.5); 
         } 
         .swa-livery-tail { background: linear-gradient(to bottom, var(--swa-red) 33%, var(--swa-yellow) 33% 66%, var(--swa-blue) 66%); }
         
-        /* Passenger Windows */
         .plane-windows { position: absolute; background: repeating-linear-gradient(90deg, #ffffaa, #ffffaa 2px, transparent 2px, transparent 5px); z-index: 21; opacity: 0.9;}
 
         .anti-collision-light { position: absolute; top: 0px; left: 40%; width: 4px; height: 4px; background: #ff3333; box-shadow: 0 0 8px #ff3333, 0 0 15px #ff0000; animation: aviationStrobe 1.5s infinite; z-index: 22; border-radius: 50%;}
         @keyframes aviationStrobe { 0%, 10%, 20%, 100% { opacity: 0; } 5%, 15% { opacity: 1; transform: scale(1.5); } }
         
-        /* 16-Bit Detailed Exhaust Flame */
         .exhaust { position: absolute; right: -12px; top: 10px; width: 15px; height: 6px; background: #fff; box-shadow: -3px 0 0 #ffff66, -8px 0 0 #ff6600, -12px 0 5px rgba(255, 0, 0, 0.5); border-radius: 50%; animation: thrustFlicker 0.05s infinite alternate; z-index: 19; }
         @keyframes thrustFlicker { 0% { transform: scaleX(1) translateY(-1px); opacity: 0.8;} 100% { transform: scaleX(1.3) translateY(1px); opacity: 1;} }
         
-        /* Plane Sizes with rounded 16-bit noses */
         .plane-md { width: 80px; height: 20px; }
         .plane-md::before { left: 0; top: 5px; width: 65px; height: 12px; border-radius: 20px 5px 5px 20px; box-shadow: 3px -3px rgba(0,0,0,0.3); }
         .plane-md::after { right: 0; top: -2px; width: 15px; height: 22px; border-radius: 5px 5px 0 0;}
@@ -176,12 +195,10 @@
         .ground-takeoff { animation: groundTakeoff linear infinite; z-index: 20; }
         .ground-landing { animation: groundLanding linear infinite; z-index: 20; }
 
-        /* Animations */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); filter: brightness(1.2); } 100% { transform: scale(1); } }
         .animate-fade { animation: fadeIn 0.5s ease-out forwards; }
 
-        /* Host Dashboard */
         #host-screen { width: 100%; box-sizing: border-box; }
         .host-header-controls { display: flex; justify-content: space-around; align-items: center; margin-bottom: 20px; flex-wrap: wrap;}
         .host-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; text-align: left; }
@@ -224,11 +241,17 @@
     
     <div id="fireworks-container" class="hidden">
         <div class="firework fw-1"></div><div class="firework fw-2"></div><div class="firework fw-3"></div>
+        <div class="firework fw-4"></div><div class="firework fw-5"></div><div class="firework fw-6"></div>
+        <div class="firework fw-7"></div><div class="firework fw-8"></div><div class="firework fw-9"></div>
+        <div class="firework fw-10"></div>
     </div>
+
     <div class="moon"></div><div id="stars-container"></div>
-    <div class="cloud" style="top: 10%; animation-duration: 60s;"><div class="cloud-shape" style="transform: scale(1.5);"></div></div>
-    <div class="cloud" style="top: 25%; animation-duration: 45s; animation-delay: -10s;"><div class="cloud-shape"></div></div>
+    <div class="cloud" style="top: 8%; animation-duration: 80s;"><div class="cloud-shape" style="transform: scale(3.5);"></div></div>
+    <div class="cloud" style="top: 20%; animation-duration: 55s; animation-delay: -20s;"><div class="cloud-shape" style="transform: scale(2.5);"></div></div>
+    <div class="cloud" style="top: 35%; animation-duration: 100s; animation-delay: -40s;"><div class="cloud-shape" style="transform: scale(4.5); opacity: 0.6;"></div></div>
     <div class="bird-flock" style="top: 20%; animation-duration: 30s;"><div class="bird"></div><div class="bird" style="top: 10px; left: 15px;"></div></div>
+    
     <div class="ufo"><div class="ufo-dome"></div><div class="ufo-body"></div><div class="ufo-lights"></div></div>
     
     <div class="terminal-hub"><div class="hub-windows"></div></div>
