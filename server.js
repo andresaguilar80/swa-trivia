@@ -24,8 +24,8 @@ const QUESTIONS = [
 // --- STATE MACHINE & GAME LOGIC ---
 class TriviaGame {
     constructor() {
-        this.state = 'LOBBY'; // States: LOBBY, QUESTION, LEADERBOARD, PODIUM
-        this.players = new Map(); // Key: UUID (Not socket ID) -> Value: Player Object
+        this.state = 'LOBBY'; 
+        this.players = new Map(); 
         this.currentQuestionIndex = 0;
         this.hostSocketId = null;
         this.questionStartTime = 0;
@@ -33,10 +33,10 @@ class TriviaGame {
 
     addOrUpdatePlayer(uuid, name, socketId) {
         if (!this.players.has(uuid)) {
-            if (this.state !== 'LOBBY') return false; // Prevent late joins
-            this.players.set(uuid, { name, score: 0, hasAnswered: false, socketId });
+            if (this.state !== 'LOBBY') return false; 
+            // NUEVO: lastAnswer añadido a la memoria del jugador
+            this.players.set(uuid, { name, score: 0, hasAnswered: false, socketId, lastAnswer: null });
         } else {
-            // Update socket ID on reconnect
             let p = this.players.get(uuid);
             p.socketId = socketId;
         }
@@ -53,7 +53,8 @@ class TriviaGame {
     getTopPlayers(limit = 10) {
         return Array.from(this.players.values())
             .sort((a, b) => b.score - a.score)
-            .map(p => ({ name: p.name, score: p.score, hasAnswered: p.hasAnswered }))
+            // NUEVO: Enviamos el lastAnswer al cliente
+            .map(p => ({ name: p.name, score: p.score, hasAnswered: p.hasAnswered, lastAnswer: p.lastAnswer }))
             .slice(0, limit);
     }
 
@@ -63,6 +64,7 @@ class TriviaGame {
         for (let [_, player] of this.players) {
             player.score = 0;
             player.hasAnswered = false;
+            player.lastAnswer = null;
         }
     }
 }
@@ -73,7 +75,6 @@ const game = new TriviaGame();
 io.on('connection', (socket) => {
     socket.emit('hostStatus', !!game.hostSocketId);
 
-    // Host Authentication
     socket.on('claimHost', (adminName) => {
         if (adminName !== ADMIN_ID) {
             return socket.emit('hostClaimed', { success: false, message: "INVALID CREDENTIALS." });
@@ -87,31 +88,31 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Player Join with Persistence
     socket.on('join', ({ name, uuid }) => {
         const joined = game.addOrUpdatePlayer(uuid, name, socket.id);
         if (!joined) {
             return socket.emit('joinError', 'The flight has already departed!');
         }
-        io.emit('updatePlayers', game.getTopPlayers(100)); // Broadcast to lobby
+        io.emit('updatePlayers', game.getTopPlayers(100)); 
         socket.emit('joinSuccess');
     });
 
-    // Host Actions
     socket.on('startQuestion', () => {
         if (socket.id !== game.hostSocketId || game.state === 'QUESTION') return;
         
         game.state = 'QUESTION';
         game.questionStartTime = Date.now();
         
-        for (let [_, p] of game.players) p.hasAnswered = false;
+        for (let [_, p] of game.players) {
+            p.hasAnswered = false;
+            p.lastAnswer = null; // Reseteamos la respuesta anterior
+        }
 
         const isLast = game.currentQuestionIndex === (QUESTIONS.length - 1);
         io.emit('newQuestion', { qIndex: game.currentQuestionIndex, question: QUESTIONS[game.currentQuestionIndex], isLast });
         io.emit('updatePlayers', game.getTopPlayers(100)); 
     });
 
-    // Player Answers
     socket.on('answer', ({ uuid, ansIndex }) => {
         if (game.state !== 'QUESTION') return;
         
@@ -119,6 +120,10 @@ io.on('connection', (socket) => {
         if (!player || player.hasAnswered) return;
 
         player.hasAnswered = true;
+        
+        // NUEVO: Guardamos el texto exacto de la opción que eligió el usuario
+        player.lastAnswer = QUESTIONS[game.currentQuestionIndex].options[ansIndex];
+        
         const timeTaken = (Date.now() - game.questionStartTime) / 1000;
 
         if (ansIndex === QUESTIONS[game.currentQuestionIndex].ans) {
@@ -128,7 +133,6 @@ io.on('connection', (socket) => {
         io.emit('updatePlayers', game.getTopPlayers(100));
     });
 
-    // Resolve Question
     socket.on('endQuestion', () => {
         if (socket.id !== game.hostSocketId) return;
         
@@ -156,7 +160,6 @@ io.on('connection', (socket) => {
             game.hostSocketId = null;
             io.emit('hostStatus', false);
         }
-        // Players remain in `game.players` in case they reconnect
     });
 });
 
