@@ -18,7 +18,6 @@
 
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Courier New', Courier, monospace; background-color: #000; }
         
-        /* CRT OVERLAYS */
         .crt-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
@@ -35,13 +34,11 @@
         }
         @keyframes flicker { 0% { opacity: 0.9; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* BACKGROUND LAYERS */
         .bg-layer-sky { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--retro-sky); z-index: 0; }
         .bg-layer-city { position: absolute; bottom: 30%; left: 0; width: 200%; height: 40%; background-image: url('/assets/city-skyline.png'); background-size: contain; background-repeat: repeat-x; opacity: 0.8; z-index: 1; animation: panLeft 60s linear infinite; image-rendering: pixelated; }
         .bg-layer-ground { position: absolute; bottom: 0; left: 0; width: 100%; height: 35%; background-color: var(--ground-gray); background-image: url('/assets/runway-tarmac.png'); background-size: cover; border-top: 4px solid white; z-index: 2; image-rendering: pixelated;}
         @keyframes panLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-        /* GAME UI LAYOUT */
         #game-layout { position: relative; z-index: 100; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; padding: 20px; box-sizing: border-box; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         
         #game-card { 
@@ -60,7 +57,6 @@
         h1 { color: var(--swa-yellow); text-transform: uppercase; letter-spacing: 2px; margin-top: 0; text-shadow: 3px 3px 0 #000; font-size: 32px; text-align: center; line-height: 1.2; width: 100%;}
         .subtitle { color: white; font-size: 20px; text-shadow: 2px 2px 0 #000; margin-bottom: 20px; display: block;}
 
-        /* CENTERED BUTTONS */
         .btn { 
             font-family: 'Courier New', Courier, monospace; padding: 15px 30px; margin: 10px auto; font-size: 18px; cursor: pointer; border: 3px solid white; border-radius: 4px; font-weight: bold; transition: all 0.2s ease; box-shadow: inset 0 -4px 0 rgba(0,0,0,0.4), 4px 4px 0 rgba(0,0,0,0.6); width: 100%; max-width: 400px; box-sizing: border-box; text-transform: uppercase;
             display: flex; justify-content: center; align-items: center; text-align: center;
@@ -79,7 +75,6 @@
         #timer { font-size: 60px; font-weight: bold; color: var(--swa-yellow); margin: 15px auto; text-shadow: 4px 4px 0 #000; text-align: center; width: 100%;}
         .timer-warning { color: var(--swa-red) !important; animation: pulse 0.5s infinite; }
 
-        /* CENTERED INPUTS */
         input { 
             font-family: 'Courier New', Courier, monospace; padding: 15px; font-size: 18px; border-radius: 4px; border: 3px solid white; background: rgba(0,0,0,0.6); color: white; 
             text-align: center; width: 100%; max-width: 300px; outline: none; box-sizing: border-box; text-transform: uppercase; margin: 0 auto 15px auto; display: block;
@@ -93,11 +88,11 @@
         .flex-center-col { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
 
         #leaderboard { font-size: 20px; text-align: left; width: 100%; max-width: 400px; margin: 0 auto; background: transparent; padding: 0; border: none; box-sizing: border-box; list-style: none; text-shadow: 2px 2px 0 #000; color: white;}
-        #leaderboard li { margin-bottom: 10px; display: flex; justify-content: space-between; font-weight: bold; background: rgba(0,0,0,0.4); padding: 5px 10px; border-radius: 4px; border-left: 4px solid var(--swa-yellow);}
+        #leaderboard li { margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; background: rgba(0,0,0,0.4); padding: 8px 10px; border-radius: 4px; border-left: 4px solid var(--swa-yellow);}
+        
         .lobby-names-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 20px; max-height: 250px; overflow-y: auto; padding: 10px; width: 100%;}
         .lobby-name { text-transform: uppercase; text-shadow: 2px 2px 0px #000; }
 
-        /* PODIUM 16-BIT SHADING */
         .podium-container { display: flex; justify-content: center; align-items: flex-end; gap: 5px; margin-top: 20px; height: 220px; width: 100%; max-width: 500px;}
         .podium-place { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; width: 30%; text-shadow: 2px 2px 0 #000; }
         .podium-bar { width: 100%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 28px; color: black; border-radius: 4px 4px 0 0; box-shadow: inset 0 10px 0 rgba(255,255,255,0.4), inset -10px 0 0 rgba(0,0,0,0.3); border: 2px solid #000; text-shadow: none;}
@@ -107,7 +102,6 @@
         .podium-name { margin-bottom: 5px; font-weight: bold; text-align: center; word-wrap: break-word; width: 100%; line-height: 1; }
         .podium-score { margin-bottom: 5px; font-size: 14px; color: #fff; }
 
-        /* 10 FIREWORKS WITH SWA COLORS */
         .firework { position: absolute; width: 6px; height: 6px; border-radius: 50%; animation: explode 2.5s infinite ease-out; z-index: 5; opacity: 0; }
         .fw-1 { top: 15%; left: 15%; animation-delay: 0.0s; } .fw-2 { top: 25%; left: 35%; animation-delay: 0.4s; } 
         .fw-3 { top: 10%; left: 55%; animation-delay: 0.8s; } .fw-4 { top: 30%; left: 75%; animation-delay: 1.2s; }
@@ -121,34 +115,16 @@
             100% { transform: scale(1.5); opacity: 0; } 
         }
 
-        /* 16-BIT CSS ART UPGRADES */
-        
-        /* 16-BIT GIANT CLOUDS */
         .cloud { position: absolute; opacity: 0.85; animation: moveClouds linear infinite; z-index: 1;}
-        .cloud-shape { 
-            width: 24px; height: 24px; background: #fff; border-radius: 50%;
-            box-shadow: 
-                -15px 5px 0 5px #fff, 15px 5px 0 5px #fff, 0 -10px 0 10px #fff,
-                -25px 15px 0 0 #ddd, 25px 15px 0 0 #ddd, 0 15px 0 5px #ddd;
-        }
+        .cloud-shape { width: 24px; height: 24px; background: #fff; border-radius: 50%; box-shadow: -15px 5px 0 5px #fff, 15px 5px 0 5px #fff, 0 -10px 0 10px #fff, -25px 15px 0 0 #ddd, 25px 15px 0 0 #ddd, 0 15px 0 5px #ddd; }
         @keyframes moveClouds { from { transform: translateX(110vw); } to { transform: translateX(-60vw); } }
 
-        /* 16-BIT FAST UFO */
         .ufo { position: absolute; top: 15%; left: -100px; width: 60px; height: 25px; z-index: 3; animation: ufoFastZip 12s linear infinite; animation-delay: 5s; opacity: 0; }
         .ufo-body { position: absolute; width: 60px; height: 16px; background: linear-gradient(to bottom, #ccc, #555); border-radius: 50px; top: 5px; box-shadow: inset 0 -3px 5px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.5); }
         .ufo-dome { position: absolute; width: 24px; height: 12px; background: radial-gradient(circle at 50% 20%, #aaffaa, #00ff00); border-radius: 50px 50px 0 0; top: -5px; left: 18px; opacity: 0.9; box-shadow: 0 0 15px #00ff00; }
         .ufo-lights { position: absolute; bottom: 2px; left: 10px; width: 6px; height: 6px; background: #ff3333; border-radius: 50%; box-shadow: 15px 0 #ffff33, 30px 0 #33ccff, 40px 0 #ff3333; animation: blinkUfo 0.15s infinite; }
-        
         @keyframes blinkUfo { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
-        @keyframes ufoFastZip { 
-            0% { transform: translateX(-10vw) translateY(0) rotate(10deg); opacity: 0; }
-            1% { opacity: 1; }
-            10% { transform: translateX(40vw) translateY(-15vh) rotate(-15deg); }
-            15% { transform: translateX(50vw) translateY(10vh) rotate(20deg); }
-            25% { transform: translateX(120vw) translateY(-10vh) rotate(-5deg); opacity: 1; }
-            26% { opacity: 0; transform: translateX(120vw); }
-            100% { opacity: 0; transform: translateX(120vw); }
-        }
+        @keyframes ufoFastZip { 0% { transform: translateX(-10vw) translateY(0) rotate(10deg); opacity: 0; } 1% { opacity: 1; } 10% { transform: translateX(40vw) translateY(-15vh) rotate(-15deg); } 15% { transform: translateX(50vw) translateY(10vh) rotate(20deg); } 25% { transform: translateX(120vw) translateY(-10vh) rotate(-5deg); opacity: 1; } 26% { opacity: 0; transform: translateX(120vw); } 100% { opacity: 0; transform: translateX(120vw); } }
 
         .control-tower { position: absolute; bottom: 29%; left: 5%; width: 36px; height: 100px; background: linear-gradient(to right, #666, #333); border-left: 2px solid #999; border-right: 4px solid #111; z-index: 1;}
         .tower-cab { position: absolute; top: 0; left: -8px; width: 52px; height: 30px; background: linear-gradient(to bottom, #777, #444); border-top: 2px solid #aaa; border-bottom: 4px solid #111; border-radius: 4px; }
@@ -159,20 +135,11 @@
         .terminal-hub { position: absolute; bottom: 29%; left: 10%; width: 450px; height: 60px; background: linear-gradient(to bottom, #666, #444); border-top: 3px solid #999; border-bottom: 5px solid #222; box-shadow: 10px 10px 0 rgba(0,0,0,0.6); z-index: 1;}
         .hub-windows { position: absolute; top: 15px; left: 15px; width: 12px; height: 12px; background: #ffff99; box-shadow: 25px 0 #ffff99, 50px 0 #ffff99, 120px 0 #ffff99, 145px 0 #ffff99, 240px 0 #ffff99, 265px 0 #ffff99, 360px 0 #ffff99, 385px 0 #ffff99; animation: lightsOn 5s infinite; }
 
-        /* 16-BIT PLANES */
         .plane { position: absolute; z-index: 20; image-rendering: pixelated;}
-        .plane::before { 
-            content: ''; position: absolute; 
-            background: linear-gradient(to bottom, var(--swa-blue-light) 0%, var(--swa-blue) 50%, var(--swa-blue-dark) 100%); 
-        } 
-        .plane::after { 
-            content: ''; position: absolute; 
-            box-shadow: inset -2px -2px 5px rgba(0,0,0,0.5); 
-        } 
+        .plane::before { content: ''; position: absolute; background: linear-gradient(to bottom, var(--swa-blue-light) 0%, var(--swa-blue) 50%, var(--swa-blue-dark) 100%); } 
+        .plane::after { content: ''; position: absolute; box-shadow: inset -2px -2px 5px rgba(0,0,0,0.5); } 
         .swa-livery-tail { background: linear-gradient(to bottom, var(--swa-red) 33%, var(--swa-yellow) 33% 66%, var(--swa-blue) 66%); }
-        
         .plane-windows { position: absolute; background: repeating-linear-gradient(90deg, #ffffaa, #ffffaa 2px, transparent 2px, transparent 5px); z-index: 21; opacity: 0.9;}
-
         .anti-collision-light { position: absolute; top: 0px; left: 40%; width: 4px; height: 4px; background: #ff3333; box-shadow: 0 0 8px #ff3333, 0 0 15px #ff0000; animation: aviationStrobe 1.5s infinite; z-index: 22; border-radius: 50%;}
         @keyframes aviationStrobe { 0%, 10%, 20%, 100% { opacity: 0; } 5%, 15% { opacity: 1; transform: scale(1.5); } }
         
@@ -544,7 +511,18 @@
                     list.innerHTML = '';
                     data.top10.forEach((p, index) => {
                         let li = document.createElement('li');
-                        li.innerHTML = `<span>${index + 1}. ${p.name}</span> <span>${p.score} PTS</span>`;
+                        
+                        let answerText = p.lastAnswer ? p.lastAnswer : "NO ANSWER";
+                        let color = (p.lastAnswer === data.correctAnswer) ? "#66ff66" : "#ff3333";
+                        
+                        li.innerHTML = `
+                            <div style="display:flex; flex-direction:column; align-items:flex-start;">
+                                <span>${index + 1}. ${p.name}</span>
+                                <span style="font-size:12px; color:${color}; margin-top: 4px;">➜ ${answerText}</span>
+                            </div>
+                            <span>${p.score} PTS</span>
+                        `;
+                        
                         list.appendChild(li);
                     });
                     
