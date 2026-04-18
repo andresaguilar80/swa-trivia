@@ -15,15 +15,14 @@
             --retro-sky-mid: #1a2a6c;
             --retro-sky-bot: #5b3e75;
             --ground-gray: #333333;
+            --city-silhouette: #151b3b;
         }
 
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Courier New', Courier, monospace; background-color: var(--swa-blue); }
         body { display: flex; justify-content: center; align-items: center; color: white; text-align: center; }
 
         #game-layout { position: relative; z-index: 10; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; padding: 20px; box-sizing: border-box; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-        
         #game-card { background-color: rgba(17, 27, 77, 0.85); backdrop-filter: blur(5px); padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 3px solid var(--swa-yellow); max-width: 500px; width: 100%; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; transition: all 0.5s ease; margin: auto; }
-        
         .transparent-card { background: transparent !important; border: none !important; box-shadow: none !important; backdrop-filter: none !important; }
 
         h1 { color: var(--swa-yellow); text-transform: uppercase; letter-spacing: 2px; margin-top: 0; text-shadow: 2px 2px 0 #000; font-size: 28px; }
@@ -36,8 +35,6 @@
         .btn-b { background-color: var(--swa-yellow); color: black; border-color: black; }
         .btn-c { background-color: var(--swa-red); color: white; border-color: white; }
         .btn-d { background-color: var(--swa-silver); color: black; border-color: black; }
-        
-        /* NEW: Utility for the Skip Timer button */
         .btn-skip { background-color: var(--swa-red); color: white; border-color: white; padding: 10px 20px; font-size: 16px; margin: 0 5px; }
 
         .hidden { display: none !important; }
@@ -65,14 +62,33 @@
         .podium-name { margin-bottom: 5px; font-weight: bold; text-align: center; word-wrap: break-word; width: 100%; line-height: 1; }
         .podium-score { margin-bottom: 5px; font-size: 14px; color: #fff; }
 
-        /* BACKGROUND */
+        /* --- BACKGROUND LAYER & NEW UPGRADES --- */
         .retro-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, var(--retro-sky-top), var(--retro-sky-mid) 40%, var(--retro-sky-bot) 70%, #d9d9d9 70%, #999999 71%, var(--ground-gray) 71%); z-index: 0; image-rendering: pixelated; }
+        
+        /* NEW: City Skyline Parallax Layer */
+        .city-skyline { position: absolute; bottom: 30%; left: 0; width: 100%; height: 60px; opacity: 0.8; z-index: 0;
+            background-image: 
+                linear-gradient(to top, var(--city-silhouette) 0%, var(--city-silhouette) 30px, transparent 30px),
+                linear-gradient(to top, #0f142d 0%, #0f142d 50px, transparent 50px),
+                linear-gradient(to top, #0c1024 0%, #0c1024 20px, transparent 20px);
+            background-size: 80px 100%, 120px 100%, 40px 100%;
+            background-position: 0 0, 40px 0, 100px 0;
+            background-repeat: repeat-x;
+        }
+
+        /* NEW: Runway Lights (Strobes & Taxiways) */
+        .runway-center-lights { position: absolute; bottom: 28%; left: 0; width: 100%; height: 2px; background: repeating-linear-gradient(90deg, transparent, transparent 50px, #fff8a6 50px, #fff8a6 65px); animation: strobeMove 2s linear infinite; opacity: 0.6;}
+        .runway-edge-lights { position: absolute; bottom: 26.5%; left: 0; width: 100%; height: 2px; background: repeating-linear-gradient(90deg, transparent, transparent 40px, #4d88ff 40px, #4d88ff 44px); opacity: 0.5; }
+        @keyframes strobeMove { from { background-position: 0 0; } to { background-position: -115px 0; } }
+
         .star { position: absolute; background: white; width: 2px; height: 2px; border-radius: 50%; animation: twinkle 3s infinite; }
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; transform: scale(1.2); } }
         .moon { position: absolute; top: 5%; right: 10%; width: 40px; height: 40px; background: var(--swa-yellow); border-radius: 50%; box-shadow: -10px 0 0 0 var(--retro-sky-top); }
+        
         .cloud { position: absolute; background: white; opacity: 0.6; animation: moveClouds linear infinite; }
         .cloud-shape { width: 20px; height: 20px; box-shadow: -20px 0 white, 20px 0 white, 0 -20px white, 0 20px white, -40px 20px white, 40px 20px white, -20px 40px white, 20px 40px white; }
         @keyframes moveClouds { from { transform: translateX(110vw); } to { transform: translateX(-60vw); } }
+        
         .bird-flock { position: absolute; width: 50px; height: 30px; animation: moveFlock linear infinite; }
         .bird { position: absolute; background: black; width: 4px; height: 2px; box-shadow: -4px -2px black, 4px -2px black; animation: birdFlap 0.4s infinite; }
         @keyframes birdFlap { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
@@ -85,10 +101,19 @@
         @keyframes blinkUfo { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         @keyframes ufoZip { 0% { transform: translateX(0) translateY(0); } 10% { transform: translateX(20vw) translateY(-5vh); } 20% { transform: translateX(50vw) translateY(5vh); } 30% { transform: translateX(120vw) translateY(0); } 100% { transform: translateX(120vw); } }
 
+        /* PLANES & LIVERIES */
         .plane { position: absolute; z-index: 1; image-rendering: pixelated;}
         .plane::before { content: ''; position: absolute; background: var(--swa-blue); } 
         .plane::after { content: ''; position: absolute; } 
         .swa-livery-tail { background: linear-gradient(to bottom, var(--swa-red) 33%, var(--swa-yellow) 33% 66%, var(--swa-blue) 66%); }
+
+        /* NEW: Anti-Collision Beacons */
+        .anti-collision-light { position: absolute; top: 3px; left: 40%; width: 3px; height: 3px; background: #ff3333; box-shadow: 0 -2px 5px #ff3333; animation: aviationStrobe 1.5s infinite; z-index: 3;}
+        @keyframes aviationStrobe { 0%, 10%, 20%, 100% { opacity: 0; } 5%, 15% { opacity: 1; } }
+
+        /* NEW: Exhaust Flare */
+        .exhaust { position: absolute; right: -8px; top: 12px; width: 12px; height: 4px; background: rgba(255, 200, 0, 0.8); box-shadow: -5px 0 5px rgba(255, 50, 0, 0.5); border-radius: 50%; animation: thrustFlicker 0.1s infinite; z-index: 0; }
+        @keyframes thrustFlicker { 0% { transform: scaleX(1); opacity: 0.6;} 50% { transform: scaleX(1.5); opacity: 1;} }
 
         .plane-md { width: 80px; height: 20px; }
         .plane-md::before { left: 0; top: 5px; width: 60px; height: 10px; box-shadow: 5px -5px var(--swa-blue); }
@@ -97,23 +122,27 @@
         .plane-lg::before { left: 0; top: 8px; width: 90px; height: 14px; box-shadow: 7px -7px var(--swa-blue); }
         .plane-lg::after { right: 0; top: 0; width: 22px; height: 30px; box-shadow: -50px 22px var(--swa-silver), -70px 22px var(--swa-silver); }
 
-        .parked-planes-container { position: absolute; bottom: 29%; left: 10%; width: 400px; display: flex; gap: 40px; }
+        .parked-planes-container { position: absolute; bottom: 29%; left: 10%; width: 400px; display: flex; gap: 40px; z-index: 2;}
         .static-plane { position: relative; width: 80px; height: 30px; transform: scaleX(-1); }
         .static-plane::before { content: ''; position: absolute; background: var(--swa-blue); left: 0; top: 15px; width: 60px; height: 10px; box-shadow: 5px -5px var(--swa-blue); }
         .static-plane::after { content: ''; position: absolute; right: 0; top: 10px; width: 15px; height: 20px; box-shadow: -35px 15px var(--swa-silver), -50px 15px var(--swa-silver); }
         .jet-bridge { position: absolute; background: #888; width: 15px; height: 5px; top: 20px; left: 55px; box-shadow: 1px 1px 0 #000; }
 
-        .terminal-hub { position: absolute; bottom: 29%; left: 10%; width: 450px; height: 60px; background: #666; border-top: 4px solid var(--swa-silver); box-shadow: 6px 6px 0 rgba(0,0,0,0.4); }
+        .terminal-hub { position: absolute; bottom: 29%; left: 10%; width: 450px; height: 60px; background: #555; border-top: 4px solid var(--swa-silver); box-shadow: 6px 6px 0 rgba(0,0,0,0.4); z-index: 1;}
         .hub-windows { position: absolute; top: 10px; left: 10px; width: 10px; height: 10px; background: #ffff99; box-shadow: 20px 0 #ffff99, 40px 0 #ffff99, 100px 0 #ffff99, 120px 0 #ffff99, 200px 0 #ffff99, 220px 0 #ffff99, 300px 0 #ffff99, 320px 0 #ffff99; animation: lightsOn 5s infinite; }
-        .control-tower { position: absolute; bottom: 29%; left: 5%; width: 30px; height: 100px; background: #555; border: 2px solid #333; }
-        .tower-cab { position: absolute; top: 0; left: -5px; width: 40px; height: 25px; background: #666; border: 2px solid #333; }
+        
+        /* NEW: Animated Radar on Tower */
+        .control-tower { position: absolute; bottom: 29%; left: 5%; width: 30px; height: 100px; background: #444; border: 2px solid #222; z-index: 1;}
+        .tower-cab { position: absolute; top: 0; left: -5px; width: 40px; height: 25px; background: #555; border: 2px solid #222; }
         .tower-windows { position: absolute; top: 5px; left: 5px; width: 5px; height: 10px; background: #ffff99; box-shadow: 10px 0 #ffff99, 20px 0 #ffff99; }
+        .radar-dish { position: absolute; top: -12px; left: 10px; width: 16px; height: 6px; border-bottom: 4px solid #888; border-radius: 0 0 10px 10px; animation: radarSpin 2s linear infinite; }
+        @keyframes radarSpin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
         @keyframes lightsOn { 0%, 40%, 100% { opacity: 1; } 50%, 90% { opacity: 0.2; } }
 
         @keyframes groundTakeoff { 0% { transform: translate(0, 0) rotate(0deg); bottom: 29%; left: -100px; opacity: 0; } 5% { opacity: 1; } 10% { transform: translate(10vw, 0) rotate(0deg); bottom: 29%; } 30% { transform: translate(40vw, 0) rotate(0deg); bottom: 29%; } 50% { transform: translate(60vw, 1vh) rotate(-10deg); bottom: 31%; } 80% { transform: translate(90vw, 20vh) rotate(-18deg); bottom: 50%; } 100% { transform: translate(130vw, 40vh) rotate(-20deg); bottom: 70%; opacity: 0; } }
         @keyframes groundLanding { 0% { transform: translate(0, 0) scaleX(-1) rotate(10deg); top: 5%; right: -100px; opacity: 0; } 5% { opacity: 1; } 40% { transform: translate(-40vw, 15vh) scaleX(-1) rotate(6deg); top: 25%; } 65% { transform: translate(-75vw, 66vh) scaleX(-1) rotate(2deg); top: 66%; } 70% { transform: translate(-80vw, 66.5vh) scaleX(-1) rotate(0deg); top: 66.5%; } 95% { transform: translate(-110vw, 66.5vh) scaleX(-1) rotate(0deg); top: 66.5%; opacity: 1; } 100% { transform: translate(-130vw, 66.5vh) scaleX(-1) rotate(0deg); top: 66.5%; opacity: 0; } }
-        .ground-takeoff { animation: groundTakeoff linear infinite; z-index: 2; }
-        .ground-landing { animation: groundLanding linear infinite; z-index: 2; }
+        .ground-takeoff { animation: groundTakeoff linear infinite; z-index: 3; }
+        .ground-landing { animation: groundLanding linear infinite; z-index: 3; }
 
         /* ANIMATIONS */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -129,20 +158,8 @@
         .fw-4 { top: 30%; left: 80%; animation-delay: 0.9s; }
         .fw-5 { top: 20%; left: 50%; animation-delay: 1.2s; }
         .fw-6 { top: 15%; left: 75%; animation-delay: 1.5s; }
-
-        @keyframes explode {
-            0% { box-shadow: 0 0 0 0 var(--swa-yellow); opacity: 1; transform: scale(1); }
-            50% { 
-                box-shadow: 
-                -30px -30px 0 0 var(--swa-red), 30px -30px 0 0 var(--swa-red), 
-                -30px 30px 0 0 var(--swa-light-blue), 30px 30px 0 0 var(--swa-light-blue), 
-                0 -45px 0 0 var(--swa-yellow), 0 45px 0 0 var(--swa-yellow), 
-                -45px 0 0 0 var(--swa-silver), 45px 0 0 0 var(--swa-silver);
-                opacity: 1; 
-            }
-            100% { transform: scale(1.5); opacity: 0; }
-        }
-
+        @keyframes explode { 0% { box-shadow: 0 0 0 0 var(--swa-yellow); opacity: 1; transform: scale(1); } 50% { box-shadow: -30px -30px 0 0 var(--swa-red), 30px -30px 0 0 var(--swa-red), -30px 30px 0 0 var(--swa-light-blue), 30px 30px 0 0 var(--swa-light-blue), 0 -45px 0 0 var(--swa-yellow), 0 45px 0 0 var(--swa-yellow), -45px 0 0 0 var(--swa-silver), 45px 0 0 0 var(--swa-silver); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+        
         .animate-fade { animation: fadeIn 0.8s ease-out forwards; }
         .animate-slide { animation: slideDown 0.6s ease-out forwards; }
 
@@ -150,7 +167,6 @@
         #host-screen { width: 100%; box-sizing: border-box; }
         .host-header-controls { display: flex; justify-content: space-around; align-items: center; margin-bottom: 20px; flex-wrap: wrap;}
         .host-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; text-align: left; }
-        
         .host-panel { background: rgba(0,0,0,0.6); border: 2px solid var(--swa-silver); border-radius: 20px; padding: 15px; height: 350px; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; font-size: 14px; text-shadow: 1px 1px 0 #000; }
         .host-panel::-webkit-scrollbar, #game-layout::-webkit-scrollbar { width: 10px; }
         .host-panel::-webkit-scrollbar-track, #game-layout::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); border-radius: 5px; }
@@ -181,16 +197,10 @@
 <body>
 
     <div class="retro-background">
-        <div class="moon"></div>
-        <div id="stars-container"></div>
+        <div class="moon"></div><div id="stars-container"></div>
         
         <div id="fireworks-container" class="hidden">
-            <div class="firework fw-1"></div>
-            <div class="firework fw-2"></div>
-            <div class="firework fw-3"></div>
-            <div class="firework fw-4"></div>
-            <div class="firework fw-5"></div>
-            <div class="firework fw-6"></div>
+            <div class="firework fw-1"></div><div class="firework fw-2"></div><div class="firework fw-3"></div><div class="firework fw-4"></div><div class="firework fw-5"></div><div class="firework fw-6"></div>
         </div>
 
         <div class="cloud" style="top: 10%; animation-duration: 60s;"><div class="cloud-shape" style="transform: scale(1.5);"></div></div>
@@ -198,18 +208,35 @@
         <div class="bird-flock" style="top: 20%; animation-duration: 30s;"><div class="bird"></div><div class="bird" style="top: 10px; left: 15px;"></div></div>
         <div class="ufo"><div class="ufo-dome"></div><div class="ufo-body"></div><div class="ufo-lights"></div></div>
 
-        <div class="terminal-hub"><div class="hub-windows"></div></div>
-        <div class="control-tower"><div class="tower-cab"><div class="tower-windows"></div></div></div>
+        <div class="city-skyline"></div>
 
-        <div class="parked-planes-container">
-            <div class="gate-slot"><div class="jet-bridge"></div><div class="static-plane swa-livery-tail"></div></div>
-            <div class="gate-slot"><div class="jet-bridge"></div><div class="static-plane swa-livery-tail"></div></div>
-            <div class="gate-slot"><div class="jet-bridge"></div><div class="static-plane swa-livery-tail"></div></div>
+        <div class="runway-center-lights"></div>
+        <div class="runway-edge-lights"></div>
+
+        <div class="terminal-hub"><div class="hub-windows"></div></div>
+        
+        <div class="control-tower">
+            <div class="radar-dish"></div>
+            <div class="tower-cab"><div class="tower-windows"></div></div>
         </div>
 
-        <div class="plane plane-lg swa-livery-tail ground-takeoff" style="animation-duration: 18s;"></div>
-        <div class="plane plane-md swa-livery-tail ground-takeoff" style="animation-duration: 22s; animation-delay: 10s;"></div>
-        <div class="plane plane-lg swa-livery-tail ground-landing" style="animation-duration: 25s; animation-delay: 5s;"></div>
+        <div class="parked-planes-container">
+            <div class="gate-slot"><div class="jet-bridge"></div><div class="static-plane swa-livery-tail"><div class="anti-collision-light"></div></div></div>
+            <div class="gate-slot"><div class="jet-bridge"></div><div class="static-plane swa-livery-tail"><div class="anti-collision-light"></div></div></div>
+            <div class="gate-slot"><div class="jet-bridge"></div><div class="static-plane swa-livery-tail"><div class="anti-collision-light"></div></div></div>
+        </div>
+
+        <div class="plane plane-lg swa-livery-tail ground-takeoff" style="animation-duration: 18s;">
+            <div class="anti-collision-light"></div>
+            <div class="exhaust"></div>
+        </div>
+        <div class="plane plane-md swa-livery-tail ground-takeoff" style="animation-duration: 22s; animation-delay: 10s;">
+            <div class="anti-collision-light"></div>
+            <div class="exhaust"></div>
+        </div>
+        <div class="plane plane-lg swa-livery-tail ground-landing" style="animation-duration: 25s; animation-delay: 5s;">
+            <div class="anti-collision-light"></div>
+        </div>
     </div>
 
     <div id="game-layout">
@@ -217,19 +244,17 @@
             <h1 class="animate-fade">SWA PI 2026.3 PI Trivia</h1>
             
             <div id="login-screen" class="animate-fade" style="width: 100%;">
-                
                 <div id="player-login-section">
                     <input type="text" id="username" placeholder="ENTER PILOT NAME" maxlength="20">
-                    <button class="btn btn-b" onclick="joinGame()">JOIN GAME</button>
+                    <button class="btn btn-b" id="btn-join">JOIN GAME</button>
                     <br><br><br>
-                    <button id="btn-show-host" class="btn" style="background: transparent; border: 2px solid white; color: white; box-shadow: none;" onclick="showHostLogin()">I AM THE HOST</button>
+                    <button id="btn-show-host" class="btn" style="background: transparent; border: 2px solid white; color: white; box-shadow: none;">I AM THE HOST</button>
                 </div>
-
                 <div id="host-login-section" class="hidden">
                     <h3 style="color: var(--swa-silver);">ADMINISTRATOR</h3>
                     <input type="password" id="admin-password" placeholder="ADMIN ID" maxlength="20">
-                    <button class="btn btn-c" onclick="becomeHost()">LOGIN</button>
-                    <button class="btn" style="background: transparent; border: 2px solid var(--swa-silver); color: var(--swa-silver); box-shadow: none;" onclick="cancelHostLogin()">CANCEL</button>
+                    <button class="btn btn-c" id="btn-login-host">LOGIN</button>
+                    <button class="btn" id="btn-cancel-host" style="background: transparent; border: 2px solid var(--swa-silver); color: var(--swa-silver); box-shadow: none;">CANCEL</button>
                 </div>
             </div>
 
@@ -239,47 +264,28 @@
                         <h2 style="color: var(--swa-yellow); text-shadow: 2px 2px 0 #000; margin: 0;">COMMAND CENTER</h2>
                         <h3 id="player-count" style="margin: 5px 0;">PLAYERS: 0</h3>
                     </div>
-                    
-                    <button id="start-btn" class="btn btn-c" onclick="startQuestion()" style="max-width: 250px;">START GAME</button>
-                    
-                    <button id="force-end-btn" class="btn btn-skip hidden" onclick="forceEndQuestion()">⏭️ SKIP TIMER</button>
-                    <button id="jump-btn" class="btn btn-b hidden" onclick="jumpToNext()" style="max-width: 250px;">⏭️ FORCE NEXT Q</button>
-                    
-                    <div id="timer-host" class="hidden" style="font-size:24px; color: var(--swa-yellow); font-weight: bold; margin-left: 10px;">Q TIME: <span id="time-left-host">20</span>s</div>
+                    <button id="start-btn" class="btn btn-c">START GAME</button>
+                    <button id="force-end-btn" class="btn btn-skip hidden">⏭️ SKIP TIMER</button>
+                    <button id="jump-btn" class="btn btn-b hidden">⏭️ FORCE NEXT Q</button>
+                    <div id="timer-host" class="hidden" style="font-size:24px; color: var(--swa-yellow); font-weight: bold;">Q TIME: <span id="time-left-host">20</span>s</div>
                 </div>
-
                 <div class="host-grid">
-                    <div class="host-panel">
-                        <h3>🟢 LIVE USERS</h3>
-                        <ul id="host-user-list"></ul>
-                    </div>
-                    <div class="host-panel">
-                        <h3>🏆 LIVE RANKING</h3>
-                        <ul id="host-live-leaderboard"></ul>
-                    </div>
-                    <div class="host-panel">
-                        <h3>📋 QUESTIONS GUIDE</h3>
-                        <ul id="host-questions-list"></ul>
-                    </div>
+                    <div class="host-panel"><h3>🟢 LIVE USERS</h3><ul id="host-user-list"></ul></div>
+                    <div class="host-panel"><h3>🏆 LIVE RANKING</h3><ul id="host-live-leaderboard"></ul></div>
+                    <div class="host-panel"><h3>📋 QUESTIONS GUIDE</h3><ul id="host-questions-list"></ul></div>
                 </div>
             </div>
 
             <div id="game-screen" class="hidden" style="width: 100%;">
-                
                 <div id="bonus-banner" class="hidden" style="color: var(--swa-yellow); font-size: 26px; font-weight: bold; animation: championFlash 1s infinite; margin-bottom: 15px;">BONUS - DOUBLE POINTS!</div>
-
-                <div id="question-box" class="animate-slide hidden">
-                    <h2 id="question-text" style="margin:0; font-size: 20px;">WAITING FOR HOST TO START...</h2>
-                </div>
-                
+                <div id="question-box" class="animate-slide hidden"><h2 id="question-text" style="margin:0; font-size: 20px;">WAITING FOR HOST TO START...</h2></div>
                 <div id="lobby-names-container" class="lobby-names-container"></div>
-
                 <div id="timer" class="hidden">20</div>
                 <div id="options" class="hidden animate-fade" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-                    <button class="btn btn-option btn-a" onclick="submitAnswer(0)" id="opt0">A</button>
-                    <button class="btn btn-option btn-b" onclick="submitAnswer(1)" id="opt1">B</button>
-                    <button class="btn btn-option btn-c" onclick="submitAnswer(2)" id="opt2">C</button>
-                    <button class="btn btn-option btn-d" onclick="submitAnswer(3)" id="opt3">D</button>
+                    <button class="btn btn-option btn-a" data-idx="0" id="opt0">A</button>
+                    <button class="btn btn-option btn-b" data-idx="1" id="opt1">B</button>
+                    <button class="btn btn-option btn-c" data-idx="2" id="opt2">C</button>
+                    <button class="btn btn-option btn-d" data-idx="3" id="opt3">D</button>
                 </div>
                 <div id="wait-msg" class="hidden animate-fade">
                     <h3 style="color: var(--swa-yellow); text-shadow: 2px 2px 0 #000;">✈️ ANSWERED!</h3>
@@ -289,7 +295,6 @@
 
             <div id="leaderboard-screen" class="hidden animate-slide" style="width: 100%;">
                 <h3 id="last-correct-answer" style="color: #66ff66; text-shadow: 2px 2px 0 #000; margin-top: 0; font-size: 22px;"></h3>
-                
                 <h2 style="color: var(--swa-yellow); margin-bottom: 10px; text-shadow: 2px 2px 0 #000;">TOP 10</h2>
                 <ol id="leaderboard"></ol>
                 <h3 id="leaderboard-timer" style="color: white; margin-top: 15px; font-size: 20px; text-shadow: 2px 2px 0 #000;">NEXT IN: 10s</h3>
@@ -297,9 +302,7 @@
 
             <div id="podium-screen" class="hidden animate-slide" style="width: 100%;">
                 <h2 style="color: var(--swa-yellow); font-size: 28px; margin-bottom: 10px; text-shadow: 3px 3px 0 #000;">You graduated as a PI Pilot<br>Congratulations</h2>
-                
                 <div class="podium-container" id="podium-bars"></div>
-                
                 <br>
                 <div id="restart-container"></div>
             </div>
@@ -308,354 +311,368 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
-        let isHost = false;
-        let timerInterval;
-        let gameStartedClient = false; 
-
-        const bgMusic = new Audio('/8bit-loop.mp3');
-        bgMusic.loop = true;
-        bgMusic.volume = 0.4; 
-
-        const epicEndingMusic = new Audio('/punch-out-ending.mp3');
-        epicEndingMusic.volume = 0.9; 
-
-        const nameFonts = ['Courier New', 'Arial', 'Impact', 'Comic Sans MS', 'Verdana', 'Georgia', 'Trebuchet MS', 'Lucida Console'];
-
-        function generateStars() {
-            const container = document.getElementById('stars-container');
-            for (let i = 0; i < 40; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.top = Math.random() * 65 + '%'; 
-                star.style.left = Math.random() * 100 + '%';
-                star.style.animationDelay = Math.random() * 3 + 's';
-                container.appendChild(star);
-            }
-        }
-        generateStars();
-
-        socket.on('hostStatus', (isClaimed) => {
-            const hostBtn = document.getElementById('btn-show-host');
-            if (hostBtn) {
-                if (isClaimed) {
-                    hostBtn.classList.add('hidden');
-                } else {
-                    hostBtn.classList.remove('hidden');
-                }
-            }
-        });
-
-        function showHostLogin() {
-            document.getElementById('player-login-section').classList.add('hidden');
-            document.getElementById('host-login-section').classList.remove('hidden');
-        }
-
-        function cancelHostLogin() {
-            document.getElementById('host-login-section').classList.add('hidden');
-            document.getElementById('player-login-section').classList.remove('hidden');
-            document.getElementById('admin-password').value = "";
-        }
-
-        function becomeHost() {
-            const pwd = document.getElementById('admin-password').value.trim();
-            if (pwd === "") return alert("Please enter the Admin ID.");
-            socket.emit('claimHost', pwd);
-        }
-
-        socket.on('hostClaimed', (data) => {
-            if (data.success) {
-                isHost = true;
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('host-screen').classList.remove('hidden');
-                document.getElementById('game-card').style.maxWidth = '1000px'; 
+        class GameClient {
+            constructor() {
+                this.socket = io();
+                this.isHost = false;
+                this.timerInterval = null;
+                this.uuid = this.generateUUID(); 
+                this.nameFonts = ['Courier New', 'Arial', 'Impact', 'Comic Sans MS', 'Verdana', 'Georgia', 'Trebuchet MS', 'Lucida Console'];
                 
-                const qList = document.getElementById('host-questions-list');
-                qList.innerHTML = '';
-                data.questions.forEach((q, i) => {
-                    let li = document.createElement('li');
-                    li.innerHTML = `<strong style="color: white;">Q${i+1}:</strong> ${q.q}<br><i style="color:var(--swa-yellow)">Ans: ${q.options[q.ans]}</i>`;
-                    qList.appendChild(li);
-                });
-            } else {
-                alert('ACCESS DENIED: ' + (data.message || 'Another user is already hosting!'));
-                cancelHostLogin();
+                this.audio = {
+                    bg: new Audio('/8bit-loop.mp3'),
+                    epic: new Audio('/punch-out-ending.mp3')
+                };
+                this.audio.bg.loop = true;
+                this.audio.bg.volume = 0.4;
+                this.audio.epic.volume = 0.9;
+
+                this.bindEvents();
+                this.bindSocketListeners();
+                this.generateBackgroundStars();
             }
-        });
 
-        function joinGame() {
-            const name = document.getElementById('username').value.trim();
-            if(!name) return alert('ENTER YOUR PILOT NAME TO BOARD!');
-            socket.emit('join', name);
-        }
-
-        socket.on('joinSuccess', () => {
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('game-screen').classList.remove('hidden');
-            document.getElementById('question-box').classList.remove('hidden');
-            document.getElementById('question-text').innerText = "WAITING FOR HOST TO START...";
-            if (!isHost) bgMusic.play().catch(e => console.log("Audio blocked"));
-        });
-
-        socket.on('joinError', (errorMsg) => {
-            alert(errorMsg); 
-        });
-
-        socket.on('updatePlayers', (players) => {
-            if(isHost) {
-                document.getElementById('player-count').innerText = `PLAYERS: ${players.length}`;
-                const userList = document.getElementById('host-user-list');
-                userList.innerHTML = '';
-                players.forEach(p => {
-                    let li = document.createElement('li');
-                    li.innerText = p.name + (p.hasAnswered ? " ✅" : " ⏳");
-                    userList.appendChild(li);
-                });
-                const sorted = [...players].sort((a,b) => b.score - a.score).slice(0, 10);
-                const liveRank = document.getElementById('host-live-leaderboard');
-                liveRank.innerHTML = '';
-                sorted.forEach((p, i) => {
-                    let li = document.createElement('li');
-                    li.innerText = `${i+1}. ${p.name} - ${p.score} PTS`;
-                    liveRank.appendChild(li);
-                });
-            } else if (!gameStartedClient) {
-                const lobbyContainer = document.getElementById('lobby-names-container');
-                if (lobbyContainer) {
-                    lobbyContainer.innerHTML = '';
-                    players.forEach(p => {
-                        let span = document.createElement('span');
-                        span.className = 'lobby-name';
-                        span.innerText = p.name;
-                        span.style.fontFamily = nameFonts[Math.floor(Math.random() * nameFonts.length)];
-                        span.style.fontSize = Math.floor(Math.random() * 14 + 14) + 'px'; 
-                        span.style.color = Math.random() > 0.5 ? 'var(--swa-yellow)' : 'white';
-                        lobbyContainer.appendChild(span);
+            generateUUID() {
+                let sessionUUID = sessionStorage.getItem('swa_trivia_uuid');
+                if (!sessionUUID) {
+                    sessionUUID = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                        return v.toString(16);
                     });
+                    sessionStorage.setItem('swa_trivia_uuid', sessionUUID);
+                }
+                return sessionUUID;
+            }
+
+            generateBackgroundStars() {
+                const container = document.getElementById('stars-container');
+                for (let i = 0; i < 40; i++) {
+                    const star = document.createElement('div');
+                    star.className = 'star';
+                    star.style.top = Math.random() * 65 + '%'; 
+                    star.style.left = Math.random() * 100 + '%';
+                    star.style.animationDelay = Math.random() * 3 + 's';
+                    container.appendChild(star);
                 }
             }
-        });
 
-        function startQuestion() {
-            if (isHost) {
-                if (bgMusic.paused) bgMusic.play().catch(e => console.log("Audio blocked"));
+            bindEvents() {
+                document.getElementById('btn-show-host').onclick = () => {
+                    document.getElementById('player-login-section').classList.add('hidden');
+                    document.getElementById('host-login-section').classList.remove('hidden');
+                };
                 
-                document.getElementById('start-btn').classList.add('hidden'); 
-                document.getElementById('jump-btn').classList.add('hidden'); 
-                document.getElementById('force-end-btn').classList.remove('hidden'); 
-                
-                socket.emit('startQuestion');
-            }
-        }
+                document.getElementById('btn-cancel-host').onclick = () => {
+                    document.getElementById('host-login-section').classList.add('hidden');
+                    document.getElementById('player-login-section').classList.remove('hidden');
+                    document.getElementById('admin-password').value = "";
+                };
 
-        // NEW: Force End Current Question Early (Manual Override)
-        function forceEndQuestion() {
-            if (isHost) {
-                clearInterval(timerInterval);
-                document.getElementById('time-left-host').innerText = "0";
-                document.getElementById('force-end-btn').classList.add('hidden');
-                socket.emit('endQuestion');
-            }
-        }
+                document.getElementById('btn-login-host').onclick = () => {
+                    const pwd = document.getElementById('admin-password').value.trim();
+                    if (pwd === "") return alert("Please enter the Admin ID.");
+                    this.socket.emit('claimHost', pwd);
+                };
 
-        // NEW: Force Start Next Question Early (Skip 10s wait)
-        function jumpToNext() {
-            if (isHost) {
-                clearInterval(timerInterval); 
-                startQuestion();
-            }
-        }
+                document.getElementById('btn-join').onclick = () => {
+                    const name = document.getElementById('username').value.trim();
+                    if(!name) return alert('ENTER YOUR PILOT NAME TO BOARD!');
+                    this.socket.emit('join', { name, uuid: this.uuid });
+                };
 
-        socket.on('newQuestion', (data) => {
-            gameStartedClient = true;
-            document.getElementById('leaderboard-screen').classList.add('hidden');
-            document.getElementById('lobby-names-container').innerHTML = ''; 
-            
-            const qBox = document.getElementById('question-box');
-            qBox.classList.remove('animate-slide');
-            void qBox.offsetWidth; 
-            qBox.classList.add('animate-slide');
-            
-            if(!isHost) {
-                document.getElementById('game-screen').classList.remove('hidden');
-                document.getElementById('question-box').classList.remove('hidden');
-                
-                const bonusBanner = document.getElementById('bonus-banner');
-                if (data.isLast) {
-                    bonusBanner.classList.remove('hidden');
-                } else {
-                    bonusBanner.classList.add('hidden');
-                }
-
-                document.getElementById('question-text').innerText = data.question.q;
-                document.getElementById('opt0').innerText = `A) ${data.question.options[0]}`;
-                document.getElementById('opt1').innerText = `B) ${data.question.options[1]}`;
-                document.getElementById('opt2').innerText = `C) ${data.question.options[2]}`;
-                document.getElementById('opt3').innerText = `D) ${data.question.options[3]}`;
-                document.getElementById('timer').classList.remove('hidden');
-                document.getElementById('options').classList.remove('hidden');
-                document.getElementById('wait-msg').classList.add('hidden');
-            }
-            startTimer();
-        });
-
-        function submitAnswer(index) {
-            socket.emit('answer', index);
-            document.getElementById('options').classList.add('hidden');
-            document.getElementById('wait-msg').classList.remove('hidden');
-        }
-
-        function startTimer() {
-            let timeLeft = 20;
-            const timerEl = document.getElementById('timer');
-            timerEl.classList.remove('timer-warning');
-            if(!isHost) timerEl.innerText = timeLeft;
-            if(isHost) {
-                document.getElementById('timer-host').classList.remove('hidden');
-                document.getElementById('time-left-host').innerText = timeLeft;
-            }
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                if(!isHost) {
-                    timerEl.innerText = timeLeft;
-                    if(timeLeft <= 5) timerEl.classList.add('timer-warning'); 
-                }
-                if(isHost) document.getElementById('time-left-host').innerText = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    timerEl.classList.remove('timer-warning');
-                    if(isHost) {
-                        document.getElementById('force-end-btn').classList.add('hidden');
-                        socket.emit('endQuestion');
+                document.getElementById('start-btn').onclick = () => {
+                    if (this.isHost) {
+                        if (this.audio.bg.paused) this.audio.bg.play().catch(e => console.log("Audio blocked"));
+                        document.getElementById('start-btn').classList.add('hidden'); 
+                        document.getElementById('jump-btn').classList.add('hidden'); 
+                        document.getElementById('force-end-btn').classList.remove('hidden'); 
+                        this.socket.emit('startQuestion');
                     }
+                };
+
+                document.getElementById('force-end-btn').onclick = () => {
+                    if (this.isHost) {
+                        clearInterval(this.timerInterval);
+                        document.getElementById('time-left-host').innerText = "0";
+                        document.getElementById('force-end-btn').classList.add('hidden');
+                        this.socket.emit('endQuestion');
+                    }
+                };
+
+                document.getElementById('jump-btn').onclick = () => {
+                    if (this.isHost) {
+                        clearInterval(this.timerInterval); 
+                        document.getElementById('start-btn').click(); 
+                    }
+                };
+
+                for(let i=0; i<4; i++) {
+                    document.getElementById(`opt${i}`).onclick = (e) => {
+                        const idx = parseInt(e.target.getAttribute('data-idx'));
+                        this.socket.emit('answer', { uuid: this.uuid, ansIndex: idx });
+                        document.getElementById('options').classList.add('hidden');
+                        document.getElementById('wait-msg').classList.remove('hidden');
+                    };
                 }
-            }, 1000);
-        }
-
-        socket.on('leaderboard', (data) => {
-            document.getElementById('game-screen').classList.add('hidden');
-            document.getElementById('leaderboard-screen').classList.remove('hidden');
-            
-            document.getElementById('last-correct-answer').innerText = "✔️ Correct: " + data.correctAnswer;
-
-            const list = document.getElementById('leaderboard');
-            list.innerHTML = '';
-            data.top10.forEach((p, index) => {
-                let li = document.createElement('li');
-                li.innerText = `${index + 1}. ${p.name} - ${p.score} PTS`;
-                list.appendChild(li);
-            });
-            
-            if(isHost) {
-                document.getElementById('force-end-btn').classList.add('hidden');
-                document.getElementById('jump-btn').classList.remove('hidden');
             }
 
-            let boardTimeLeft = 10;
-            const lbTimerEl = document.getElementById('leaderboard-timer');
-            lbTimerEl.innerText = `NEXT IN: ${boardTimeLeft}s`;
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                boardTimeLeft--;
+            bindSocketListeners() {
+                this.socket.on('hostStatus', (isClaimed) => {
+                    const hostBtn = document.getElementById('btn-show-host');
+                    if (hostBtn) hostBtn.classList.toggle('hidden', isClaimed);
+                });
+
+                this.socket.on('hostClaimed', (data) => {
+                    if (data.success) {
+                        this.isHost = true;
+                        document.getElementById('login-screen').classList.add('hidden');
+                        document.getElementById('host-screen').classList.remove('hidden');
+                        document.getElementById('game-card').style.maxWidth = '1000px'; 
+                        
+                        const qList = document.getElementById('host-questions-list');
+                        qList.innerHTML = '';
+                        data.questions.forEach((q, i) => {
+                            let li = document.createElement('li');
+                            li.innerHTML = `<strong style="color: white;">Q${i+1}:</strong> ${q.q}<br><i style="color:var(--swa-yellow)">Ans: ${q.options[q.ans]}</i>`;
+                            qList.appendChild(li);
+                        });
+                    } else {
+                        alert('ACCESS DENIED: ' + (data.message || 'Another user is already hosting!'));
+                        document.getElementById('btn-cancel-host').click();
+                    }
+                });
+
+                this.socket.on('joinSuccess', () => {
+                    document.getElementById('login-screen').classList.add('hidden');
+                    document.getElementById('game-screen').classList.remove('hidden');
+                    document.getElementById('question-box').classList.remove('hidden');
+                    document.getElementById('question-text').innerText = "WAITING FOR HOST TO START...";
+                    if (!this.isHost) this.audio.bg.play().catch(e => console.log("Audio blocked"));
+                });
+
+                this.socket.on('joinError', (msg) => alert(msg));
+
+                this.socket.on('updatePlayers', (players) => {
+                    if (this.isHost) {
+                        document.getElementById('player-count').innerText = `PLAYERS: ${players.length}`;
+                        const userList = document.getElementById('host-user-list');
+                        userList.innerHTML = '';
+                        players.forEach(p => {
+                            let li = document.createElement('li');
+                            li.innerText = p.name + (p.hasAnswered ? " ✅" : " ⏳");
+                            userList.appendChild(li);
+                        });
+                        
+                        const liveRank = document.getElementById('host-live-leaderboard');
+                        liveRank.innerHTML = '';
+                        players.slice(0, 10).forEach((p, i) => {
+                            let li = document.createElement('li');
+                            li.innerText = `${i+1}. ${p.name} - ${p.score} PTS`;
+                            liveRank.appendChild(li);
+                        });
+                    } else if (document.getElementById('question-text').innerText.includes("WAITING")) {
+                        const lobbyContainer = document.getElementById('lobby-names-container');
+                        if (lobbyContainer) {
+                            lobbyContainer.innerHTML = '';
+                            players.forEach(p => {
+                                let span = document.createElement('span');
+                                span.className = 'lobby-name';
+                                span.innerText = p.name;
+                                span.style.fontFamily = this.nameFonts[Math.floor(Math.random() * this.nameFonts.length)];
+                                span.style.fontSize = Math.floor(Math.random() * 14 + 14) + 'px'; 
+                                span.style.color = Math.random() > 0.5 ? 'var(--swa-yellow)' : 'white';
+                                lobbyContainer.appendChild(span);
+                            });
+                        }
+                    }
+                });
+
+                this.socket.on('newQuestion', (data) => {
+                    document.getElementById('leaderboard-screen').classList.add('hidden');
+                    document.getElementById('lobby-names-container').innerHTML = ''; 
+                    
+                    const qBox = document.getElementById('question-box');
+                    qBox.classList.remove('animate-slide');
+                    void qBox.offsetWidth; 
+                    qBox.classList.add('animate-slide');
+                    
+                    if(!this.isHost) {
+                        document.getElementById('game-screen').classList.remove('hidden');
+                        document.getElementById('question-box').classList.remove('hidden');
+                        
+                        document.getElementById('bonus-banner').classList.toggle('hidden', !data.isLast);
+
+                        document.getElementById('question-text').innerText = data.question.q;
+                        for(let i=0; i<4; i++) {
+                            document.getElementById(`opt${i}`).innerText = `${['A','B','C','D'][i]}) ${data.question.options[i]}`;
+                        }
+                        
+                        document.getElementById('timer').classList.remove('hidden');
+                        document.getElementById('options').classList.remove('hidden');
+                        document.getElementById('wait-msg').classList.add('hidden');
+                    }
+                    this.startCountdown();
+                });
+
+                this.socket.on('leaderboard', (data) => {
+                    document.getElementById('game-screen').classList.add('hidden');
+                    document.getElementById('leaderboard-screen').classList.remove('hidden');
+                    
+                    document.getElementById('last-correct-answer').innerText = "✔️ Correct: " + data.correctAnswer;
+
+                    const list = document.getElementById('leaderboard');
+                    list.innerHTML = '';
+                    data.top10.forEach((p, index) => {
+                        let li = document.createElement('li');
+                        li.innerText = `${index + 1}. ${p.name} - ${p.score} PTS`;
+                        list.appendChild(li);
+                    });
+                    
+                    if(this.isHost) {
+                        document.getElementById('force-end-btn').classList.add('hidden');
+                        document.getElementById('jump-btn').classList.remove('hidden');
+                    }
+
+                    this.startLeaderboardTimer();
+                });
+
+                this.socket.on('gameOver', (podium) => {
+                    clearInterval(this.timerInterval); 
+                    document.getElementById('game-screen').classList.add('hidden');
+                    document.getElementById('leaderboard-screen').classList.add('hidden');
+                    document.getElementById('host-screen').classList.add('hidden');
+                    
+                    document.getElementById('game-card').classList.add('transparent-card');
+                    
+                    if(this.isHost) {
+                        document.getElementById('jump-btn').classList.add('hidden');
+                        document.getElementById('force-end-btn').classList.add('hidden');
+                    }
+                    
+                    document.getElementById('podium-screen').classList.remove('hidden');
+                    document.getElementById('fireworks-container').classList.remove('hidden');
+
+                    const podiumBars = document.getElementById('podium-bars');
+                    podiumBars.innerHTML = '';
+                    
+                    const visualOrder = [1, 0, 2]; 
+                    visualOrder.forEach(idx => {
+                        let p = podium[idx];
+                        if (p) {
+                            let placeDiv = document.createElement('div');
+                            placeDiv.className = 'podium-place';
+                            
+                            let nameDiv = document.createElement('div');
+                            nameDiv.className = 'podium-name';
+                            nameDiv.style.fontSize = idx === 0 ? '26px' : '18px';
+                            nameDiv.style.color = idx === 0 ? 'var(--swa-yellow)' : 'white';
+                            if (idx === 0) nameDiv.style.animation = 'championFlash 1s infinite';
+                            
+                            nameDiv.innerText = `${idx === 0 ? '✈️' : '🛫'}\n${p.name}`;
+
+                            let scoreDiv = document.createElement('div');
+                            scoreDiv.className = 'podium-score';
+                            scoreDiv.innerText = p.score + ' PTS';
+
+                            let barDiv = document.createElement('div');
+                            barDiv.className = `podium-bar podium-${idx + 1}`;
+                            barDiv.innerText = idx === 0 ? '1ST' : (idx === 1 ? '2ND' : '3RD');
+
+                            placeDiv.appendChild(nameDiv);
+                            placeDiv.appendChild(scoreDiv);
+                            placeDiv.appendChild(barDiv);
+                            podiumBars.appendChild(placeDiv);
+                        }
+                    });
+
+                    this.audio.bg.pause();
+                    this.audio.bg.currentTime = 0;
+                    this.audio.epic.play().catch(e => console.log("Audio blocked"));
+                    
+                    const restartContainer = document.getElementById('restart-container');
+                    if (this.isHost) {
+                        restartContainer.innerHTML = '<button class="btn btn-c" id="btn-restart" style="max-width: 250px;">RESTART GAME</button>';
+                        document.getElementById('btn-restart').onclick = () => this.socket.emit('restartGame');
+                    } else {
+                        restartContainer.innerHTML = '<p style="color: var(--swa-yellow); font-weight: bold; text-shadow: 2px 2px 0 #000;">WAITING FOR HOST TO RESTART...</p>';
+                    }
+                });
+
+                this.socket.on('gameReset', () => {
+                    this.audio.epic.pause();
+                    this.audio.epic.currentTime = 0;
+                    clearInterval(this.timerInterval);
+                    
+                    document.getElementById('game-card').classList.remove('transparent-card');
+                    document.getElementById('podium-screen').classList.add('hidden');
+                    document.getElementById('fireworks-container').classList.add('hidden'); 
+                    document.getElementById('bonus-banner').classList.add('hidden');
+                    
+                    if (this.isHost) {
+                        document.getElementById('host-screen').classList.remove('hidden');
+                        document.getElementById('start-btn').classList.remove('hidden'); 
+                    } else {
+                        document.getElementById('game-screen').classList.remove('hidden');
+                        document.getElementById('question-text').innerText = "WAITING FOR HOST TO START...";
+                        document.getElementById('options').classList.add('hidden');
+                        document.getElementById('wait-msg').classList.add('hidden');
+                        document.getElementById('timer').classList.add('hidden');
+                        this.audio.bg.play().catch(e => console.log("Audio blocked"));
+                    }
+                });
+            }
+
+            startCountdown() {
+                let timeLeft = 20;
+                const timerEl = document.getElementById('timer');
+                timerEl.classList.remove('timer-warning');
+                
+                if(!this.isHost) timerEl.innerText = timeLeft;
+                if(this.isHost) {
+                    document.getElementById('timer-host').classList.remove('hidden');
+                    document.getElementById('time-left-host').innerText = timeLeft;
+                }
+                
+                clearInterval(this.timerInterval);
+                this.timerInterval = setInterval(() => {
+                    timeLeft--;
+                    if(!this.isHost) {
+                        timerEl.innerText = timeLeft;
+                        if(timeLeft <= 5) timerEl.classList.add('timer-warning'); 
+                    }
+                    if(this.isHost) document.getElementById('time-left-host').innerText = timeLeft;
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(this.timerInterval);
+                        timerEl.classList.remove('timer-warning');
+                        if(this.isHost) {
+                            document.getElementById('force-end-btn').classList.add('hidden');
+                            this.socket.emit('endQuestion');
+                        }
+                    }
+                }, 1000);
+            }
+
+            startLeaderboardTimer() {
+                let boardTimeLeft = 10;
+                const lbTimerEl = document.getElementById('leaderboard-timer');
                 lbTimerEl.innerText = `NEXT IN: ${boardTimeLeft}s`;
-                if (boardTimeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    if (isHost) startQuestion(); 
-                }
-            }, 1000);
-        });
-
-        socket.on('gameOver', (podium) => {
-            clearInterval(timerInterval); 
-            document.getElementById('game-screen').classList.add('hidden');
-            document.getElementById('leaderboard-screen').classList.add('hidden');
-            document.getElementById('host-screen').classList.add('hidden');
-            
-            document.getElementById('game-card').classList.add('transparent-card');
-            
-            if(isHost) {
-                document.getElementById('jump-btn').classList.add('hidden');
-                document.getElementById('force-end-btn').classList.add('hidden');
+                
+                clearInterval(this.timerInterval);
+                this.timerInterval = setInterval(() => {
+                    boardTimeLeft--;
+                    lbTimerEl.innerText = `NEXT IN: ${boardTimeLeft}s`;
+                    if (boardTimeLeft <= 0) {
+                        clearInterval(this.timerInterval);
+                        if (this.isHost) document.getElementById('start-btn').click(); 
+                    }
+                }, 1000);
             }
-            
-            document.getElementById('podium-screen').classList.remove('hidden');
-            document.getElementById('fireworks-container').classList.remove('hidden');
-
-            const podiumBars = document.getElementById('podium-bars');
-            podiumBars.innerHTML = '';
-            
-            const visualOrder = [1, 0, 2]; 
-            
-            visualOrder.forEach(idx => {
-                let p = podium[idx];
-                if (p) {
-                    let placeDiv = document.createElement('div');
-                    placeDiv.className = 'podium-place';
-                    
-                    let nameDiv = document.createElement('div');
-                    nameDiv.className = 'podium-name';
-                    nameDiv.style.fontSize = idx === 0 ? '26px' : '18px';
-                    nameDiv.style.color = idx === 0 ? 'var(--swa-yellow)' : 'white';
-                    if (idx === 0) nameDiv.style.animation = 'championFlash 1s infinite';
-                    
-                    let emoji = idx === 0 ? '✈️' : '🛫';
-                    nameDiv.innerText = `${emoji}\n${p.name}`;
-
-                    let scoreDiv = document.createElement('div');
-                    scoreDiv.className = 'podium-score';
-                    scoreDiv.innerText = p.score + ' PTS';
-
-                    let barDiv = document.createElement('div');
-                    barDiv.className = `podium-bar podium-${idx + 1}`;
-                    barDiv.innerText = idx === 0 ? '1ST' : (idx === 1 ? '2ND' : '3RD');
-
-                    placeDiv.appendChild(nameDiv);
-                    placeDiv.appendChild(scoreDiv);
-                    placeDiv.appendChild(barDiv);
-                    podiumBars.appendChild(placeDiv);
-                }
-            });
-
-            bgMusic.pause();
-            bgMusic.currentTime = 0;
-            epicEndingMusic.play().catch(err => console.log("Audio blocked"));
-            
-            const restartContainer = document.getElementById('restart-container');
-            if (isHost) {
-                restartContainer.innerHTML = '<button class="btn btn-c" onclick="restartGame()" style="max-width: 250px;">RESTART GAME</button>';
-            } else {
-                restartContainer.innerHTML = '<p style="color: var(--swa-yellow); font-weight: bold; text-shadow: 2px 2px 0 #000;">WAITING FOR HOST TO RESTART...</p>';
-            }
-        });
-
-        function restartGame() {
-            if (isHost) socket.emit('restartGame');
         }
 
-        socket.on('gameReset', () => {
-            gameStartedClient = false;
-            epicEndingMusic.pause();
-            epicEndingMusic.currentTime = 0;
-            clearInterval(timerInterval);
-            
-            document.getElementById('game-card').classList.remove('transparent-card');
-            document.getElementById('podium-screen').classList.add('hidden');
-            document.getElementById('fireworks-container').classList.add('hidden'); 
-            document.getElementById('bonus-banner').classList.add('hidden');
-            
-            if (isHost) {
-                document.getElementById('host-screen').classList.remove('hidden');
-                document.getElementById('start-btn').classList.remove('hidden'); 
-            } else {
-                document.getElementById('game-screen').classList.remove('hidden');
-                document.getElementById('question-text').innerText = "WAITING FOR HOST TO START...";
-                document.getElementById('options').classList.add('hidden');
-                document.getElementById('wait-msg').classList.add('hidden');
-                document.getElementById('timer').classList.add('hidden');
-                bgMusic.play().catch(e => console.log("Audio blocked"));
-            }
-        });
+        window.onload = () => {
+            const app = new GameClient();
+        };
     </script>
 </body>
 </html>
