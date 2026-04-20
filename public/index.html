@@ -193,7 +193,7 @@
         @media (max-width: 768px) {
             #game-card { padding: 40px 20px 20px 20px; }
             .host-header-controls { flex-direction: column; gap: 15px; }
-            #start-btn, #force-end-btn, #jump-btn { width: 100%; max-width: 100%; margin: 5px auto;}
+            #start-btn, #force-end-btn { width: 100%; max-width: 100%; margin: 5px auto;}
             .host-grid { grid-template-columns: 1fr; }
             .parked-planes-container { transform: scale(0.4); }
         }
@@ -301,8 +301,7 @@
                     </div>
                     
                     <button id="start-btn" class="btn btn-c">START / NEXT Q</button>
-                    <button id="force-end-btn" class="btn btn-skip">⏭️ SKIP TIMER</button>
-                    <button id="jump-btn" class="btn btn-b">⏭️ SKIP RANKING</button>
+                    <button id="force-end-btn" class="btn btn-skip hidden">⏭️ SKIP TIMER</button>
                     
                     <div id="timer-host" class="hidden" style="font-size:24px; color: var(--swa-yellow); font-weight: bold; text-align: center; width: 100%; margin-top: 15px;">Q TIME: <span id="time-left-host">20</span>s</div>
                 </div>
@@ -333,7 +332,7 @@
             <div id="leaderboard-screen" class="hidden animate-slide flex-center-col">
                 <div id="last-correct-answer" style="background: rgba(0,0,0,0.8); border: 2px solid #66ff66; border-radius: 4px; color: #66ff66; padding: 10px; margin-bottom: 20px; font-weight: bold; text-align: center; width: 100%; box-shadow: inset 0 0 10px rgba(100,255,100,0.2);"></div>
                 <ol id="leaderboard"></ol>
-                <h3 id="leaderboard-timer" style="color: white; margin-top: 15px; font-size: 20px; text-shadow: 2px 2px 0 #000; text-align: center;">NEXT IN: 10s</h3>
+                <h3 id="leaderboard-timer" style="color: white; margin-top: 15px; font-size: 20px; text-shadow: 2px 2px 0 #000; text-align: center;">WAITING FOR HOST...</h3>
             </div>
 
             <div id="podium-screen" class="hidden animate-slide flex-center-col">
@@ -421,6 +420,7 @@
                     this.socket.emit('join', { name, uuid: this.uuid });
                 };
 
+                // BOTÓN MAESTRO DE INICIO Y AVANCE
                 document.getElementById('start-btn').onclick = () => {
                     if (this.isHost) {
                         if (this.audio.bg.paused) this.audio.bg.play().catch(e => console.log("Audio blocked"));
@@ -428,18 +428,12 @@
                     }
                 };
 
+                // BOTÓN DE SALTAR TIEMPO (Solo visible durante la pregunta)
                 document.getElementById('force-end-btn').onclick = () => {
                     if (this.isHost) {
                         clearInterval(this.timerInterval);
                         document.getElementById('time-left-host').innerText = "0";
                         this.socket.emit('endQuestion');
-                    }
-                };
-
-                document.getElementById('jump-btn').onclick = () => {
-                    if (this.isHost) {
-                        clearInterval(this.timerInterval); 
-                        this.socket.emit('startQuestion'); 
                     }
                 };
 
@@ -532,8 +526,14 @@
                     qBox.classList.remove('animate-slide');
                     void qBox.offsetWidth; 
                     qBox.classList.add('animate-slide');
-                    
-                    if(!this.isHost) {
+
+                    if(this.isHost) {
+                        // Modo Host: Esconder Start, Mostrar Skip Timer
+                        document.getElementById('start-btn').classList.add('hidden');
+                        document.getElementById('force-end-btn').classList.remove('hidden');
+                        document.getElementById('timer-host').classList.remove('hidden');
+                    } else {
+                        // Modo Jugador
                         document.getElementById('game-screen').classList.remove('hidden');
                         document.getElementById('question-box').classList.remove('hidden');
                         
@@ -552,29 +552,35 @@
                 });
 
                 this.socket.on('leaderboard', (data) => {
-                    document.getElementById('game-screen').classList.add('hidden');
-                    document.getElementById('leaderboard-screen').classList.remove('hidden');
-                    
-                    document.getElementById('last-correct-answer').innerText = "✔️ Correct: " + data.correctAnswer;
-
-                    const list = document.getElementById('leaderboard');
-                    list.innerHTML = '';
-                    data.top10.slice(0, 10).forEach((p, index) => {
-                        let li = document.createElement('li');
-                        let answerText = p.lastAnswer ? p.lastAnswer : "NO ANSWER";
-                        let color = (p.lastAnswer === data.correctAnswer) ? "#66ff66" : "#ff3333";
+                    if(this.isHost) {
+                        // Modo Host: Mostrar Start, Esconder Skip Timer
+                        document.getElementById('start-btn').classList.remove('hidden');
+                        document.getElementById('force-end-btn').classList.add('hidden');
+                        document.getElementById('time-left-host').innerText = "0";
+                    } else {
+                        // Modo Jugador
+                        document.getElementById('game-screen').classList.add('hidden');
+                        document.getElementById('leaderboard-screen').classList.remove('hidden');
                         
-                        li.innerHTML = `
-                            <div style="display:flex; flex-direction:column; align-items:flex-start;">
-                                <span>${index + 1}. ${p.name}</span>
-                                <span style="font-size:12px; color:${color}; margin-top: 4px;">➜ ${answerText}</span>
-                            </div>
-                            <span>${p.score} PTS</span>
-                        `;
-                        list.appendChild(li);
-                    });
+                        document.getElementById('last-correct-answer').innerText = "✔️ Correct: " + data.correctAnswer;
 
-                    this.startLeaderboardTimer();
+                        const list = document.getElementById('leaderboard');
+                        list.innerHTML = '';
+                        data.top10.slice(0, 10).forEach((p, index) => {
+                            let li = document.createElement('li');
+                            let answerText = p.lastAnswer ? p.lastAnswer : "NO ANSWER";
+                            let color = (p.lastAnswer === data.correctAnswer) ? "#66ff66" : "#ff3333";
+                            
+                            li.innerHTML = `
+                                <div style="display:flex; flex-direction:column; align-items:flex-start;">
+                                    <span>${index + 1}. ${p.name}</span>
+                                    <span style="font-size:12px; color:${color}; margin-top: 4px;">➜ ${answerText}</span>
+                                </div>
+                                <span>${p.score} PTS</span>
+                            `;
+                            list.appendChild(li);
+                        });
+                    }
                 });
 
                 this.socket.on('gameOver', (podium) => {
@@ -664,6 +670,9 @@
                     
                     if (this.isHost) {
                         document.getElementById('host-screen').classList.remove('hidden');
+                        document.getElementById('start-btn').classList.remove('hidden'); 
+                        document.getElementById('force-end-btn').classList.add('hidden'); 
+                        document.getElementById('timer-host').classList.add('hidden'); 
                     } else {
                         document.getElementById('game-screen').classList.remove('hidden');
                         document.getElementById('question-box').classList.remove('hidden');
@@ -683,7 +692,6 @@
                 
                 if(!this.isHost) timerEl.innerText = timeLeft;
                 if(this.isHost) {
-                    document.getElementById('timer-host').classList.remove('hidden');
                     document.getElementById('time-left-host').innerText = timeLeft;
                 }
                 
@@ -699,22 +707,6 @@
                     if (timeLeft <= 0) {
                         clearInterval(this.timerInterval);
                         timerEl.classList.remove('timer-warning');
-                    }
-                }, 1000);
-            }
-
-            startLeaderboardTimer() {
-                let boardTimeLeft = 10;
-                const lbTimerEl = document.getElementById('leaderboard-timer');
-                lbTimerEl.innerText = `NEXT IN: ${boardTimeLeft}s`;
-                
-                clearInterval(this.timerInterval);
-                this.timerInterval = setInterval(() => {
-                    boardTimeLeft--;
-                    lbTimerEl.innerText = `NEXT IN: ${boardTimeLeft}s`;
-                    if (boardTimeLeft <= 0) {
-                        clearInterval(this.timerInterval);
-                        if (this.isHost) document.getElementById('start-btn').click(); 
                     }
                 }, 1000);
             }
