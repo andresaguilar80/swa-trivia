@@ -299,10 +299,12 @@
                         <h2 style="color: var(--swa-yellow); text-shadow: 2px 2px 0 #000; margin: 0;">COMMAND CENTER</h2>
                         <h3 id="player-count" style="margin: 5px 0;">PLAYERS: 0</h3>
                     </div>
-                    <button id="start-btn" class="btn btn-c">START GAME</button>
-                    <button id="force-end-btn" class="btn btn-skip hidden">⏭️ SKIP TIMER</button>
-                    <button id="jump-btn" class="btn btn-b hidden">⏭️ FORCE NEXT Q</button>
-                    <div id="timer-host" class="hidden" style="font-size:24px; color: var(--swa-yellow); font-weight: bold; text-align: center; width: 100%;">Q TIME: <span id="time-left-host">20</span>s</div>
+                    
+                    <button id="start-btn" class="btn btn-c">START / NEXT Q</button>
+                    <button id="force-end-btn" class="btn btn-skip">⏭️ SKIP TIMER</button>
+                    <button id="jump-btn" class="btn btn-b">⏭️ SKIP RANKING</button>
+                    
+                    <div id="timer-host" class="hidden" style="font-size:24px; color: var(--swa-yellow); font-weight: bold; text-align: center; width: 100%; margin-top: 15px;">Q TIME: <span id="time-left-host">20</span>s</div>
                 </div>
                 <div class="host-grid">
                     <div class="host-panel"><h3>🟢 LIVE USERS</h3><ul id="host-user-list"></ul></div>
@@ -422,9 +424,6 @@
                 document.getElementById('start-btn').onclick = () => {
                     if (this.isHost) {
                         if (this.audio.bg.paused) this.audio.bg.play().catch(e => console.log("Audio blocked"));
-                        document.getElementById('start-btn').classList.add('hidden'); 
-                        document.getElementById('jump-btn').classList.add('hidden'); 
-                        document.getElementById('force-end-btn').classList.remove('hidden'); 
                         this.socket.emit('startQuestion');
                     }
                 };
@@ -433,7 +432,6 @@
                     if (this.isHost) {
                         clearInterval(this.timerInterval);
                         document.getElementById('time-left-host').innerText = "0";
-                        document.getElementById('force-end-btn').classList.add('hidden');
                         this.socket.emit('endQuestion');
                     }
                 };
@@ -441,7 +439,7 @@
                 document.getElementById('jump-btn').onclick = () => {
                     if (this.isHost) {
                         clearInterval(this.timerInterval); 
-                        document.getElementById('start-btn').click(); 
+                        this.socket.emit('startQuestion'); 
                     }
                 };
 
@@ -575,11 +573,6 @@
                         `;
                         list.appendChild(li);
                     });
-                    
-                    if(this.isHost) {
-                        document.getElementById('force-end-btn').classList.add('hidden');
-                        document.getElementById('jump-btn').classList.remove('hidden');
-                    }
 
                     this.startLeaderboardTimer();
                 });
@@ -591,11 +584,6 @@
                     document.getElementById('host-screen').classList.add('hidden');
                     
                     document.getElementById('game-card').classList.add('transparent-card');
-                    
-                    if(this.isHost) {
-                        document.getElementById('jump-btn').classList.add('hidden');
-                        document.getElementById('force-end-btn').classList.add('hidden');
-                    }
                     
                     document.getElementById('podium-screen').classList.remove('hidden');
                     document.getElementById('fireworks-container').classList.remove('hidden');
@@ -676,10 +664,6 @@
                     
                     if (this.isHost) {
                         document.getElementById('host-screen').classList.remove('hidden');
-                        document.getElementById('start-btn').classList.remove('hidden'); 
-                        document.getElementById('jump-btn').classList.add('hidden'); 
-                        document.getElementById('force-end-btn').classList.add('hidden'); 
-                        document.getElementById('timer-host').classList.add('hidden'); 
                     } else {
                         document.getElementById('game-screen').classList.remove('hidden');
                         document.getElementById('question-box').classList.remove('hidden');
@@ -715,10 +699,6 @@
                     if (timeLeft <= 0) {
                         clearInterval(this.timerInterval);
                         timerEl.classList.remove('timer-warning');
-                        if(this.isHost) {
-                            document.getElementById('force-end-btn').classList.add('hidden');
-                            this.socket.emit('endQuestion');
-                        }
                     }
                 }, 1000);
             }
