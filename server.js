@@ -21,7 +21,6 @@ const QUESTIONS = [
     { q: "What is the name of Southwest Airlines' frequent flyer program?", options: ["AAdvantage", "SkyMiles", "TrueBlue", "Rapid Rewards"], ans: 3 }
 ];
 
-// --- STATE MACHINE & GAME LOGIC ---
 class TriviaGame {
     constructor() {
         this.state = 'LOBBY'; 
@@ -68,9 +67,9 @@ class TriviaGame {
 }
 
 const game = new TriviaGame();
-let questionTimeout = null; // EL NUEVO RELOJ DEL SERVIDOR
+let questionTimeout = null; 
 
-// FUNCIÓN MAESTRA PARA TERMINAR LA PREGUNTA
+// EL SERVIDOR TOMA EL CONTROL DEL CIERRE DE PREGUNTAS
 function handleQuestionEnd() {
     if (game.state !== 'QUESTION') return;
     const correctText = QUESTIONS[game.currentQuestionIndex].options[QUESTIONS[game.currentQuestionIndex].ans];
@@ -85,7 +84,28 @@ function handleQuestionEnd() {
     }
 }
 
-// --- SOCKET HANDLERS ---
+// VALIDADOR: SI TODOS RESPONDEN, CORTAR TIEMPO
+function checkAllAnswered() {
+    if (game.state !== 'QUESTION') return;
+    let allAnswered = true;
+    let activePlayers = 0;
+    
+    for (let [_, p] of game.players) {
+        if (p.socketId) { // Solo cuenta jugadores conectados
+            activePlayers++;
+            if (!p.hasAnswered) {
+                allAnswered = false;
+                break;
+            }
+        }
+    }
+    
+    if (activePlayers > 0 && allAnswered) {
+        clearTimeout(questionTimeout);
+        handleQuestionEnd();
+    }
+}
+
 io.on('connection', (socket) => {
     socket.emit('hostStatus', !!game.hostSocketId);
 
@@ -93,13 +113,10 @@ io.on('connection', (socket) => {
         if (adminName !== ADMIN_ID) {
             return socket.emit('hostClaimed', { success: false, message: "INVALID CREDENTIALS." });
         }
-        if (!game.hostSocketId) {
-            game.hostSocketId = socket.id;
-            socket.emit('hostClaimed', { success: true, questions: QUESTIONS });
-            io.emit('hostStatus', true); 
-        } else {
-            socket.emit('hostClaimed', { success: false, message: "Host is already active." });
-        }
+        // Asignación forzosa: Permite reconectar al Host si recarga la página
+        game.hostSocketId = socket.id;
+        socket.emit('hostClaimed', { success: true, questions: QUESTIONS });
+        io.emit('hostStatus', true); 
     });
 
     socket.on('join', ({ name, uuid }) => {
@@ -126,11 +143,11 @@ io.on('connection', (socket) => {
         io.emit('newQuestion', { qIndex: game.currentQuestionIndex, question: QUESTIONS[game.currentQuestionIndex], isLast });
         io.emit('updatePlayers', game.getTopPlayers(100)); 
 
-        // INICIAMOS EL RELOJ INQUEBRANTABLE DEL SERVIDOR (21 SEGUNDOS)
+        // CRONÓMETRO INQUEBRANTABLE DEL SERVIDOR (20 Segundos exactos)
         clearTimeout(questionTimeout);
         questionTimeout = setTimeout(() => {
             handleQuestionEnd();
-        }, 21000); 
+        }, 20000); 
     });
 
     socket.on('answer', ({ uuid, ansIndex }) => {
@@ -149,11 +166,12 @@ io.on('connection', (socket) => {
         }
         
         io.emit('updatePlayers', game.getTopPlayers(100));
+        checkAllAnswered(); // Verificar si ya todos terminaron
     });
 
     socket.on('endQuestion', () => {
         if (socket.id !== game.hostSocketId) return;
-        clearTimeout(questionTimeout); // Cortamos el timer automático si el Host presionó el botón manual
+        clearTimeout(questionTimeout); 
         handleQuestionEnd();
     });
 
@@ -166,9 +184,12 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        if (socket.id === game.hostSocketId) {
-            game.hostSocketId = null;
-            io.emit('hostStatus', false);
+        if (game.players) {
+            for (let [uuid, p] of game.players) {
+                if (p.socketId === socket.id) {
+                    p.socketId = null; // Marca al jugador offline sin borrar su puntaje
+                }
+            }
         }
     });
 });
