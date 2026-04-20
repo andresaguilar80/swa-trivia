@@ -34,7 +34,6 @@ class TriviaGame {
     addOrUpdatePlayer(uuid, name, socketId) {
         if (!this.players.has(uuid)) {
             if (this.state !== 'LOBBY') return false; 
-            // NUEVO: lastAnswer añadido a la memoria del jugador
             this.players.set(uuid, { name, score: 0, hasAnswered: false, socketId, lastAnswer: null });
         } else {
             let p = this.players.get(uuid);
@@ -53,7 +52,6 @@ class TriviaGame {
     getTopPlayers(limit = 10) {
         return Array.from(this.players.values())
             .sort((a, b) => b.score - a.score)
-            // NUEVO: Enviamos el lastAnswer al cliente
             .map(p => ({ name: p.name, score: p.score, hasAnswered: p.hasAnswered, lastAnswer: p.lastAnswer }))
             .slice(0, limit);
     }
@@ -70,6 +68,22 @@ class TriviaGame {
 }
 
 const game = new TriviaGame();
+let questionTimeout = null; // EL NUEVO RELOJ DEL SERVIDOR
+
+// FUNCIÓN MAESTRA PARA TERMINAR LA PREGUNTA
+function handleQuestionEnd() {
+    if (game.state !== 'QUESTION') return;
+    const correctText = QUESTIONS[game.currentQuestionIndex].options[QUESTIONS[game.currentQuestionIndex].ans];
+    game.currentQuestionIndex++;
+
+    if (game.currentQuestionIndex < QUESTIONS.length) {
+        game.state = 'LEADERBOARD';
+        io.emit('leaderboard', { top10: game.getTopPlayers(10), correctAnswer: correctText });
+    } else {
+        game.state = 'PODIUM';
+        io.emit('gameOver', game.getTopPlayers(3));
+    }
+}
 
 // --- SOCKET HANDLERS ---
 io.on('connection', (socket) => {
@@ -105,12 +119,18 @@ io.on('connection', (socket) => {
         
         for (let [_, p] of game.players) {
             p.hasAnswered = false;
-            p.lastAnswer = null; // Reseteamos la respuesta anterior
+            p.lastAnswer = null; 
         }
 
         const isLast = game.currentQuestionIndex === (QUESTIONS.length - 1);
         io.emit('newQuestion', { qIndex: game.currentQuestionIndex, question: QUESTIONS[game.currentQuestionIndex], isLast });
         io.emit('updatePlayers', game.getTopPlayers(100)); 
+
+        // INICIAMOS EL RELOJ INQUEBRANTABLE DEL SERVIDOR (21 SEGUNDOS)
+        clearTimeout(questionTimeout);
+        questionTimeout = setTimeout(() => {
+            handleQuestionEnd();
+        }, 21000); 
     });
 
     socket.on('answer', ({ uuid, ansIndex }) => {
@@ -120,8 +140,6 @@ io.on('connection', (socket) => {
         if (!player || player.hasAnswered) return;
 
         player.hasAnswered = true;
-        
-        // NUEVO: Guardamos el texto exacto de la opción que eligió el usuario
         player.lastAnswer = QUESTIONS[game.currentQuestionIndex].options[ansIndex];
         
         const timeTaken = (Date.now() - game.questionStartTime) / 1000;
@@ -135,21 +153,13 @@ io.on('connection', (socket) => {
 
     socket.on('endQuestion', () => {
         if (socket.id !== game.hostSocketId) return;
-        
-        const correctText = QUESTIONS[game.currentQuestionIndex].options[QUESTIONS[game.currentQuestionIndex].ans];
-        game.currentQuestionIndex++;
-
-        if (game.currentQuestionIndex < QUESTIONS.length) {
-            game.state = 'LEADERBOARD';
-            io.emit('leaderboard', { top10: game.getTopPlayers(10), correctAnswer: correctText });
-        } else {
-            game.state = 'PODIUM';
-            io.emit('gameOver', game.getTopPlayers(3));
-        }
+        clearTimeout(questionTimeout); // Cortamos el timer automático si el Host presionó el botón manual
+        handleQuestionEnd();
     });
 
     socket.on('restartGame', () => {
         if (socket.id !== game.hostSocketId) return;
+        clearTimeout(questionTimeout);
         game.reset();
         io.emit('gameReset');
         io.emit('updatePlayers', game.getTopPlayers(100));
